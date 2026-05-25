@@ -1,10 +1,26 @@
-# Android generated
+# Built artifacts
+*.apk
+*.aar
+*.ap_
+*.aab
+*.dex
+*.class
+bin/
+gen/
+out/
+**/build/
+
+# Android Studio / IntelliJ
 *.iml
-.gradle
-/build
+*.ipr
+*.iws
+.idea/
 /captures
 .externalNativeBuild
 .cxx
+
+# Gradle
+.gradle/
 
 # Local configuration — never commit
 local.properties
@@ -12,16 +28,18 @@ local.properties
 # Salesforce credentials — never commit
 app/src/main/res/values/bootconfig.xml
 
-# IDE
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
-
 # macOS
 .DS_Store
 
 # Lint reports
 /reports/
+
+# Log files
+*.log
+
+# Keystore files
+*.jks
+*.keystore
+
+# Secrets
+secrets.properties
