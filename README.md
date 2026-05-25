@@ -274,28 +274,19 @@ BuildConfig.SALESFORCE_LOGIN_HOST   // String — sandbox vs production
 
 ### ClientProvider — session lifecycle
 
-`ClientProvider` in `:core` holds the `RestClient` and notifies registered listeners when the session starts or ends. This keeps `RestClient` out of domain and UI layers.
+`ClientProvider` in `:core` holds a `StateFlow<AppClient?>`. The `MainActivity` provides the platform-specific client, and repositories transform this flow into domain-specific states.
 
 ```kotlin
-// MainActivity — only place RestClient is handled
+// MainActivity — provides the client
 override fun onResume(client: RestClient) {
-    clientProvider.onClientAvailable(client)  // stores client + notifies listeners
-    // ...
-}
-
-override fun onPause() {
-    clientProvider.onClientRemoved()          // clears client + notifies listeners
+    clientProvider.onClientAvailable(RawClientWrapper(client))
 }
 ```
 
 ```kotlin
-// SalesforceAuthRepository — registers as listener in init
-init {
-    clientProvider.addListener(this)
-}
-
-override fun onClientAvailable(client: RestClient) {
-    _authState.value = AuthState.Authenticated(...)
+// SalesforceAuthRepository — transforms the client flow
+override val authState: Flow<AuthState> = clientProvider.client.map { client ->
+    // map to AuthState...
 }
 ```
 

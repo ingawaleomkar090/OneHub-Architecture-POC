@@ -1,26 +1,26 @@
 package com.catalent.shipment.domain.repository
 
 import com.catalent.shipment.domain.model.SObjectData
+import kotlinx.coroutines.flow.Flow
 
 interface SObjectRepository {
-    suspend fun registerSoup(sObjectType: String, displayField: String)
-    suspend fun loadFromSmartStore(
+    /**
+     * Returns a stream of data for the given [sObjectType].
+     * Emits the local data from SmartStore immediately, and then 
+     * emits again whenever the local data is updated.
+     */
+    fun getSObjects(
         sObjectType: String,
         displayField: String,
-        searchQuery: String = "",
-        page: Int = 0,
-        pageSize: Int = 20,
-    ): List<SObjectData>
-    suspend fun fetchRemote(
+        searchQuery: String = ""
+    ): Flow<List<SObjectData>>
+
+    /**
+     * Triggers a remote fetch from Salesforce and updates the local SmartStore.
+     * The [getSObjects] flow will automatically emit the new data.
+     */
+    suspend fun sync(
         sObjectType: String,
-        displayField: String,
-        searchQuery: String = "",
-        limit: Int = 20,
-        offset: Int = 0,
-    ): List<SObjectData>
-    suspend fun upsertToSmartStore(
-        sObjectType: String,
-        items: List<SObjectData>,
-        displayField: String,
+        displayField: String
     )
 }
