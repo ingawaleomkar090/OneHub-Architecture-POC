@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
 	alias(libs.plugins.android.application)
 	alias(libs.plugins.kotlin.compose)
@@ -5,6 +7,20 @@ plugins {
 	alias(libs.plugins.ksp)
 	alias(libs.plugins.kotlin.android)
 }
+
+val localProperties = Properties().apply {
+	val localPropertiesFile = rootProject.file("local.properties")
+	if (localPropertiesFile.exists()) {
+		localPropertiesFile.inputStream().use { load(it) }
+	}
+}
+
+val sfConsumerKey = localProperties.getProperty("salesforce.consumer.key")
+	?: System.getenv("SALESFORCE_CONSUMER_KEY")
+	?: ""
+val sfRedirectUri = localProperties.getProperty("salesforce.redirect.uri")
+	?: System.getenv("SALESFORCE_REDIRECT_URI")
+	?: ""
 
 android {
 	namespace = "com.catalent.onehub"
@@ -20,6 +36,10 @@ android {
 
 		// default BuildConfig fields
 		buildConfigField("String", "SALESFORCE_LOGIN_HOST", "\"login.salesforce.com\"")
+
+		// Salesforce secrets injected as resources
+		resValue("string", "remoteAccessConsumerKey", sfConsumerKey)
+		resValue("string", "oauthRedirectURI", sfRedirectUri)
 	}
 
 	buildTypes {
