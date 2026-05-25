@@ -2,24 +2,36 @@ package com.catalent.shipment.data.repository
 
 import com.catalent.core.logging.Loggable
 import com.catalent.core.network.ClientProvider
+import com.catalent.core.network.RawClientWrapper
+import com.catalent.shipment.domain.model.SObjectData
+import com.catalent.shipment.domain.repository.SObjectRepository
 import com.salesforce.androidsdk.app.SalesforceSDKManager
 import com.salesforce.androidsdk.mobilesync.app.MobileSyncSDKManager
+import com.salesforce.androidsdk.rest.RestClient
 import com.salesforce.androidsdk.rest.RestRequest
 import com.salesforce.androidsdk.smartstore.store.IndexSpec
 import com.salesforce.androidsdk.smartstore.store.QuerySpec
 import com.salesforce.androidsdk.smartstore.store.SmartStore
-import com.catalent.shipment.domain.model.SObjectData
-import com.catalent.shipment.domain.repository.SObjectRepository
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import org.json.JSONObject
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.withContext
+import org.json.JSONObject
 
 @Singleton
 class SalesforceSObjectRepository @Inject constructor(
     private val clientProvider: ClientProvider
 ) : SObjectRepository, Loggable {
+
+    // A simple trigger to refresh the flow when local data changes
+    private val refreshTrigger = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
 
     private val account get() =
         SalesforceSDKManager.getInstance().userAccountManager.currentUser
@@ -27,11 +39,39 @@ class SalesforceSObjectRepository @Inject constructor(
     private val smartStore get() =
         MobileSyncSDKManager.getInstance().getSmartStore(account)
 
-    override suspend fun registerSoup(
+    override fun getSObjects(
+        sObjectType: String,
+        displayField: String,
+        searchQuery: String
+    ): Flow<List<SObjectData>> = flow {
+        // Create an internal flow that emits whenever the trigger is pulled
+        val internalFlow = refreshTrigger
+            .onStart { emit(Unit) } // Emit immediately on start
+            .map {
+                loadFromSmartStore(sObjectType, displayField, searchQuery)
+            }
+        
+        emitAll(internalFlow)
+    }.flowOn(Dispatchers.IO)
+
+    override suspend fun sync(
+        sObjectType: String,
+        displayField: String
+    ) {
+        registerSoup(sObjectType, displayField)
+        val remoteData = fetchRemote(sObjectType, displayField)
+        if (remoteData.isNotEmpty()) {
+            upsertToSmartStore(sObjectType, remoteData, displayField)
+            // Notify flows that local data has changed
+            refreshTrigger.tryEmit(Unit)
+        }
+    }
+
+    private suspend fun registerSoup(
         sObjectType: String,
         displayField: String,
     ) = withContext(Dispatchers.IO) {
-        val soupName = "${sObjectType}Soup"
+        val soupName = getSoupName(sObjectType)
         if (!smartStore.hasSoup(soupName)) {
             val indexSpecs = arrayOf(
                 IndexSpec("Id", SmartStore.Type.string),
@@ -42,24 +82,24 @@ class SalesforceSObjectRepository @Inject constructor(
         }
     }
 
-    override suspend fun loadFromSmartStore(
+    private fun loadFromSmartStore(
         sObjectType: String,
         displayField: String,
         searchQuery: String,
-        page: Int,
-        pageSize: Int,
-    ): List<SObjectData> = withContext(Dispatchers.IO) {
-        val soupName = "${sObjectType}Soup"
+    ): List<SObjectData> {
+        val soupName = getSoupName(sObjectType)
+        if (!smartStore.hasSoup(soupName)) return emptyList()
+
         val querySpec = if (searchQuery.isEmpty()) {
-            QuerySpec.buildAllQuerySpec(soupName, "Id", QuerySpec.Order.ascending, pageSize)
+            QuerySpec.buildAllQuerySpec(soupName, "Id", QuerySpec.Order.ascending, 100)
         } else {
             QuerySpec.buildLikeQuerySpec(
                 soupName, displayField, "%$searchQuery%",
-                "Id", QuerySpec.Order.ascending, pageSize,
+                "Id", QuerySpec.Order.ascending, 100,
             )
         }
-        try {
-            val results = smartStore.query(querySpec, page)
+        return try {
+            val results = smartStore.query(querySpec, 0)
             buildList {
                 for (i in 0 until results.length()) {
                     val obj = results.getJSONObject(i)
@@ -75,25 +115,20 @@ class SalesforceSObjectRepository @Inject constructor(
         }
     }
 
-    override suspend fun fetchRemote(
+    private suspend fun fetchRemote(
         sObjectType: String,
         displayField: String,
-        searchQuery: String,
-        limit: Int,
-        offset: Int,
     ): List<SObjectData> = withContext(Dispatchers.IO) {
-        val restClient = clientProvider.client ?: return@withContext emptyList()
-        val query = if (searchQuery.isNotEmpty()) {
-            "SELECT Id, $displayField FROM $sObjectType WHERE $displayField LIKE '%$searchQuery%' ORDER BY Id LIMIT $limit"
-        } else {
-            "SELECT Id, $displayField FROM $sObjectType ORDER BY Id LIMIT $limit OFFSET $offset"
-        }
+        val clientWrapper = clientProvider.client.value as? RawClientWrapper
+        val restClient = clientWrapper?.rawClient as? RestClient ?: return@withContext emptyList()
+        
+        val query = "SELECT Id, $displayField FROM $sObjectType ORDER BY Id LIMIT 100"
+        
         try {
             val request = RestRequest.getRequestForQuery("v60.0", query)
             val response = restClient.sendSync(request)
             if (response.isSuccess) {
                 val records = response.asJSONObject().getJSONArray("records")
-                d("fetchRemote", "fetched ${records.length()} records for $sObjectType")
                 buildList {
                     for (i in 0 until records.length()) {
                         val obj = records.getJSONObject(i)
@@ -104,7 +139,6 @@ class SalesforceSObjectRepository @Inject constructor(
                     }
                 }
             } else {
-                e("fetchRemote", "failed — ${response.asString()}")
                 emptyList()
             }
         } catch (e: Exception) {
@@ -113,13 +147,12 @@ class SalesforceSObjectRepository @Inject constructor(
         }
     }
 
-    override suspend fun upsertToSmartStore(
+    private suspend fun upsertToSmartStore(
         sObjectType: String,
         items: List<SObjectData>,
         displayField: String,
     ) = withContext(Dispatchers.IO) {
-        val soupName = "${sObjectType}Soup"
-        if (!smartStore.hasSoup(soupName)) return@withContext
+        val soupName = getSoupName(sObjectType)
         items.forEach { item ->
             val json = JSONObject().apply {
                 put("Id", item.id)
@@ -128,4 +161,6 @@ class SalesforceSObjectRepository @Inject constructor(
             smartStore.upsert(soupName, json, "Id")
         }
     }
+
+    private fun getSoupName(sObjectType: String) = "${sObjectType}Soup"
 }

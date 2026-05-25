@@ -1,33 +1,22 @@
 package com.catalent.core.network
 
-import com.salesforce.androidsdk.rest.RestClient
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 @Singleton
 class ClientProvider @Inject constructor() {
 
-    private val listeners = mutableListOf<ClientListener>()
+    private val _client = MutableStateFlow<AppClient?>(null)
+    val client: StateFlow<AppClient?> = _client.asStateFlow()
 
-    var client: RestClient? = null
-        private set
-
-    fun addListener(listener: ClientListener) {
-        listeners.add(listener)
-    }
-
-    fun onClientAvailable(client: RestClient) {
-        this.client = client
-        listeners.forEach { it.onClientAvailable(client) }
+    fun onClientAvailable(client: AppClient) {
+        _client.value = client
     }
 
     fun onClientRemoved() {
-        client = null
-        listeners.forEach { it.onClientRemoved() }
-    }
-
-    interface ClientListener {
-        fun onClientAvailable(client: RestClient)
-        fun onClientRemoved()
+        _client.value = null
     }
 }

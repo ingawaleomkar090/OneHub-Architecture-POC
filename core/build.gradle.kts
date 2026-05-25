@@ -40,9 +40,6 @@ dependencies {
 	api(libs.hilt.android)
 	ksp(libs.hilt.compiler)
 
-	// Salesforce
-	api(libs.salesforce.mobile.sync)
-
 	// Logging
 	api(libs.timber)
 

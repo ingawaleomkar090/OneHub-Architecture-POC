@@ -19,6 +19,7 @@ import com.catalent.onehub.R
 import com.catalent.auth.domain.AuthState
 import com.catalent.auth.ui.AuthViewModel
 import com.catalent.core.network.ClientProvider
+import com.catalent.core.network.RawClientWrapper
 import com.catalent.core.network.NetworkManager
 import com.catalent.onehub.presentation.error.toStringRes
 import com.catalent.onehub.presentation.screen.ErrorScreen
@@ -43,7 +44,7 @@ class MainActivity : SalesforceActivity() {
     }
 
     override fun onResume(client: RestClient) {
-        clientProvider.onClientAvailable(client)
+        clientProvider.onClientAvailable(RawClientWrapper(client))
 
         setContent {
             val authState by authViewModel.authState.collectAsState()

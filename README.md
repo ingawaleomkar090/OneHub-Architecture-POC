@@ -16,6 +16,7 @@ Enterprise Android application for Catalent field agents, built on the Salesforc
 - [Key patterns](#key-patterns)
 - [Logging](#logging)
 - [Error handling](#error-handling)
+- [CI/CD & Security](#cicd--security)
 - [Development guidelines](#development-guidelines)
 - [Adding a new feature module](#adding-a-new-feature-module)
 
@@ -208,43 +209,40 @@ CatalentOneHub/
 Yet to be added
 ```
 
-**2. Create `local.properties`**
+**2. Configure Local Secrets**
+The app uses `local.properties` to manage sensitive Salesforce credentials during development. These keys are injected into the build and are not committed to Git.
 
+Create or update `local.properties` in the root folder:
 ```properties
 # local.properties — never commit this file
 salesforce.consumer.key=YOUR_CONSUMER_KEY
 salesforce.redirect.uri=fieldagentapp://mobile/oauth/onehub
 ```
 
-**3. Create `bootconfig.json`**
-
-Create at `app/src/main/res/raw/bootconfig.json`: ( future work )
-
-```json
-{
-    "remoteAccessConsumerKey": "YOUR_CONSUMER_KEY",
-    "oauthRedirectURI": "fieldagentapp://mobile/oauth/onehub",
-    "oauthScopes": ["api", "web", "refresh_token", "openid"],
-    "isLocal": false,
-    "startPage": "index.html",
-    "errorPage": "error.html",
-    "shouldAuthenticate": true,
-    "attemptOfflineLoad": false
-}
-```
-
-> Never commit this file with real credentials. It is git-ignored.
-
-**4. Configure Salesforce Connected App**
-
+**3. Configure Salesforce Connected App**
 In your Salesforce org go to `Setup → App Manager → New Connected App`:
+* **Callback URL**: `fieldagentapp://mobile/oauth/onehub`
+* **OAuth Scopes**: `api`, `web`, `refresh_token`, `openid`
+* **Permitted Users**: All users may self-authorize
+* **IP Relaxation**: Relax IP restrictions
 
-- Callback URL: `fieldagentapp://mobile/oauth/onehub`
-- OAuth Scopes: `api`, `web`, `refresh_token`, `openid`
-- Permitted Users: All users may self-authorize
-- IP Relaxation: Relax IP restrictions
+---
 
-```
+## CI/CD & Security
+
+### Production Secrets
+For release builds and CI/CD pipelines (GitHub Actions, Azure DevOps, etc.), secrets should be managed as environment variables rather than a physical `local.properties` file.
+
+The Gradle build script is configured to check for these **Environment Variables** if the local file is missing:
+
+1. `SALESFORCE_CONSUMER_KEY`
+2. `SALESFORCE_REDIRECT_URI`
+
+### Setting up a Pipeline
+1. Go to your CI/CD platform's **Secrets** or **Variable Groups** section.
+2. Add the two variables mentioned above.
+3. Paste the production values.
+4. The build task `./gradlew assembleRelease` will automatically pick them up and inject them into the APK.
 
 ---
 
@@ -274,28 +272,19 @@ BuildConfig.SALESFORCE_LOGIN_HOST   // String — sandbox vs production
 
 ### ClientProvider — session lifecycle
 
-`ClientProvider` in `:core` holds the `RestClient` and notifies registered listeners when the session starts or ends. This keeps `RestClient` out of domain and UI layers.
+`ClientProvider` in `:core` holds a `StateFlow<AppClient?>`. The `MainActivity` provides the platform-specific client, and repositories transform this flow into domain-specific states.
 
 ```kotlin
-// MainActivity — only place RestClient is handled
+// MainActivity — provides the client
 override fun onResume(client: RestClient) {
-    clientProvider.onClientAvailable(client)  // stores client + notifies listeners
-    // ...
-}
-
-override fun onPause() {
-    clientProvider.onClientRemoved()          // clears client + notifies listeners
+    clientProvider.onClientAvailable(RawClientWrapper(client))
 }
 ```
 
 ```kotlin
-// SalesforceAuthRepository — registers as listener in init
-init {
-    clientProvider.addListener(this)
-}
-
-override fun onClientAvailable(client: RestClient) {
-    _authState.value = AuthState.Authenticated(...)
+// SalesforceAuthRepository — transforms the client flow
+override val authState: Flow<AuthState> = clientProvider.client.map { client ->
+    // map to AuthState...
 }
 ```
 
