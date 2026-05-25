@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<incidents format="6" by="lint 8.9.1" type="partial_results">
+    <map id="NotificationPermission">
+        <location id="class"
+            file="$GRADLE_USER_HOME/caches/9.3.1/transforms/e1d01151e3cdff9e26a6572f243ab3b8/transformed/jetified-SalesforceSDK-13.2.0/jars/classes.jar"/>
+        <entry
+            name="className"
+            string="com/salesforce/androidsdk/developer/support/notifications/local/ShowDeveloperSupportNotifier$Companion"/>
+    </map>
+    <map id="UnusedResources">
+        <entry
+            name="model"
+            string=""/>
+    </map>
+
+</incidents>

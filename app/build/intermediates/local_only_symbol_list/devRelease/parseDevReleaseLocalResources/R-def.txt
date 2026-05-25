@@ -1,0 +1,33 @@
+R_DEF: Internal format may change without notice
+local
+array oauthScopes
+color black
+color purple_200
+color purple_500
+color purple_700
+color teal_200
+color teal_700
+color white
+drawable ic_launcher_background
+drawable ic_launcher_foreground
+mipmap ic_launcher
+mipmap ic_launcher_round
+string app_name
+string clear_button
+string error_invalid_credentials
+string error_logout_failed
+string error_network
+string error_session_expired
+string error_unknown
+string fetch_accounts_button
+string fetch_contacts_button
+string logout_button
+string oauthRedirectURI
+string remoteAccessConsumerKey
+string title_error
+string welcome
+style Theme.CatalentOneHub
+style Theme.CatalentOneHubNoActionBar
+xml backup_rules
+xml data_extraction_rules
+xml servers

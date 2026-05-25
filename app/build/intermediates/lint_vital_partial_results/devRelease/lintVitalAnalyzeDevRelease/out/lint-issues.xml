@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<incidents format="6" by="lint 8.9.1" type="configured_issues">
+    <config id="ContentDescription" severity="warning"/>
+    <config id="ExperimentalMaterialApi" severity="ignore"/>
+    <config id="HardcodedText" severity="error"/>
+    <config id="MissingTranslation" severity="warning"/>
+    <config id="ObsoleteSdkInt" severity="warning"/>
+    <config id="PrivateResource" severity="error"/>
+    <config id="UnsafeOptInUsageError" severity="ignore"/>
+    <config id="UnusedResources" severity="error"/>
+
+</incidents>

@@ -1,0 +1,36 @@
+<variant
+    name="devDebug"
+    package="com.catalent.onehub"
+    minSdkVersion="32"
+    targetSdkVersion="36"
+    debuggable="true"
+    mergedManifest="build/intermediates/merged_manifest/devDebug/processDevDebugMainManifest/AndroidManifest.xml"
+    manifestMergeReport="build/outputs/logs/manifest-merger-dev-debug-report.txt"
+    partialResultsDir="build/intermediates/android_test_lint_partial_results/devDebug/lintAnalyzeDevDebugAndroidTest/out">
+  <buildFeatures
+      namespacing="REQUIRED"/>
+  <sourceProviders>
+  </sourceProviders>
+  <testSourceProviders>
+    <sourceProvider
+        manifests="src/androidTest/AndroidManifest.xml"
+        javaDirectories="src/androidTest/java:src/androidTestDev/java:src/androidTestDebug/java:src/androidTestDevDebug/java:src/androidTest/kotlin:src/androidTestDev/kotlin:src/androidTestDebug/kotlin:src/androidTestDevDebug/kotlin"
+        resDirectories="src/androidTest/res:src/androidTestDev/res:src/androidTestDebug/res:src/androidTestDevDebug/res"
+        assetsDirectories="src/androidTest/assets:src/androidTestDev/assets:src/androidTestDebug/assets:src/androidTestDevDebug/assets"
+        androidTest="true"/>
+  </testSourceProviders>
+  <testFixturesSourceProviders>
+  </testFixturesSourceProviders>
+  <resValues>
+    <resValue
+        type="string"
+        name="app_name"
+        value="OneHub Dev" />
+  </resValues>
+  <artifact
+      type="INSTRUMENTATION_TEST"
+      applicationId="com.catalent.onehub.dev.debug.test"
+      generatedResourceFolders="build/generated/res/resValues/androidTest/dev/debug"
+      desugaredMethodsFiles="/Users/pandit_m/.gradle/caches/9.3.1/transforms/f28dd671bd3e7db526792ff2ee45a98d/transformed/D8BackportedDesugaredMethods.txt">
+  </artifact>
+</variant>

@@ -1,0 +1,687 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<incidents format="6" by="lint 8.9.1" type="incidents">
+
+    <incident
+        id="RedundantLabel"
+        severity="warning"
+        message="Redundant label can be removed">
+        <fix-attribute
+            description="Delete label"
+            namespace="http://schemas.android.com/apk/res/android"
+            attribute="label"/>
+        <location
+            file="${:app*devDebug*MAIN*sourceProvider*0*manifest*0}"
+            line="20"
+            column="13"
+            startOffset="800"
+            endLine="20"
+            endColumn="45"
+            endOffset="832"/>
+    </incident>
+
+    <incident
+        id="AndroidGradlePluginVersion"
+        severity="warning"
+        message="A newer version of com.android.application than 8.9.1 is available: 9.2.1. (There is also a newer version of 8.9.𝑥 available, if upgrading to 9.2.1 is difficult: 8.9.3)">
+        <fix-alternatives>
+            <fix-replace
+                description="Change to 9.2.1"
+                family="Update versions"
+                oldString="8.9.1"
+                replacement="9.2.1"
+                priority="0"/>
+            <fix-replace
+                description="Change to 8.9.3"
+                family="Update versions"
+                robot="true"
+                independent="true"
+                oldString="8.9.1"
+                replacement="8.9.3"
+                priority="0"/>
+        </fix-alternatives>
+        <location
+            file="$HOME/Downloads/CatalentOneHub/gradle/libs.versions.toml"
+            line="2"
+            column="7"
+            startOffset="17"
+            endLine="2"
+            endColumn="14"
+            endOffset="24"/>
+    </incident>
+
+    <incident
+        id="AndroidGradlePluginVersion"
+        severity="warning"
+        message="A newer version of com.android.library than 8.9.1 is available: 9.2.1. (There is also a newer version of 8.9.𝑥 available, if upgrading to 9.2.1 is difficult: 8.9.3)">
+        <fix-alternatives>
+            <fix-replace
+                description="Change to 9.2.1"
+                family="Update versions"
+                oldString="8.9.1"
+                replacement="9.2.1"
+                priority="0"/>
+            <fix-replace
+                description="Change to 8.9.3"
+                family="Update versions"
+                robot="true"
+                independent="true"
+                oldString="8.9.1"
+                replacement="8.9.3"
+                priority="0"/>
+        </fix-alternatives>
+        <location
+            file="$HOME/Downloads/CatalentOneHub/gradle/libs.versions.toml"
+            line="2"
+            column="7"
+            startOffset="17"
+            endLine="2"
+            endColumn="14"
+            endOffset="24"/>
+    </incident>
+
+    <incident
+        id="AndroidGradlePluginVersion"
+        severity="warning"
+        message="A newer version of com.android.tools.build:gradle than 8.9.1 is available: 9.2.1. (There is also a newer version of 8.9.𝑥 available, if upgrading to 9.2.1 is difficult: 8.9.3)">
+        <fix-alternatives>
+            <fix-replace
+                description="Change to 9.2.1"
+                family="Update versions"
+                oldString="8.9.1"
+                replacement="9.2.1"
+                priority="0"/>
+            <fix-replace
+                description="Change to 8.9.3"
+                family="Update versions"
+                robot="true"
+                independent="true"
+                oldString="8.9.1"
+                replacement="8.9.3"
+                priority="0"/>
+        </fix-alternatives>
+        <location
+            file="$HOME/Downloads/CatalentOneHub/gradle/libs.versions.toml"
+            line="2"
+            column="7"
+            startOffset="17"
+            endLine="2"
+            endColumn="14"
+            endOffset="24"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of org.jetbrains.kotlin.plugin.compose than 2.2.10 is available: 2.3.21">
+        <fix-replace
+            description="Change to 2.3.21"
+            family="Update versions"
+            oldString="2.2.10"
+            replacement="2.3.21"
+            priority="0"/>
+        <location
+            file="$HOME/Downloads/CatalentOneHub/gradle/libs.versions.toml"
+            line="3"
+            column="10"
+            startOffset="34"
+            endLine="3"
+            endColumn="18"
+            endOffset="42"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of com.google.devtools.ksp than 2.2.10-2.0.2 is available: 2.3.7">
+        <fix-replace
+            description="Change to 2.3.7"
+            family="Update versions"
+            oldString="2.2.10-2.0.2"
+            replacement="2.3.7"
+            priority="0"/>
+        <location
+            file="$HOME/Downloads/CatalentOneHub/gradle/libs.versions.toml"
+            line="4"
+            column="7"
+            startOffset="49"
+            endLine="4"
+            endColumn="21"
+            endOffset="63"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of com.google.dagger.hilt.android than 2.56 is available: 2.59.2">
+        <fix-replace
+            description="Change to 2.59.2"
+            family="Update versions"
+            oldString="2.56"
+            replacement="2.59.2"
+            priority="0"/>
+        <location
+            file="$HOME/Downloads/CatalentOneHub/gradle/libs.versions.toml"
+            line="5"
+            column="8"
+            startOffset="71"
+            endLine="5"
+            endColumn="14"
+            endOffset="77"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of com.google.dagger:hilt-android than 2.56 is available: 2.59.2">
+        <fix-replace
+            description="Change to 2.59.2"
+            family="Update versions"
+            oldString="2.56"
+            replacement="2.59.2"
+            priority="0"/>
+        <location
+            file="$HOME/Downloads/CatalentOneHub/gradle/libs.versions.toml"
+            line="5"
+            column="8"
+            startOffset="71"
+            endLine="5"
+            endColumn="14"
+            endOffset="77"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of org.jetbrains.kotlinx:kotlinx-coroutines-core than 1.8.1 is available: 1.10.2">
+        <fix-replace
+            description="Change to 1.10.2"
+            family="Update versions"
+            oldString="1.8.1"
+            replacement="1.10.2"
+            priority="0"/>
+        <location
+            file="$HOME/Downloads/CatalentOneHub/gradle/libs.versions.toml"
+            line="7"
+            column="14"
+            startOffset="114"
+            endLine="7"
+            endColumn="21"
+            endOffset="121"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of androidx.core:core-ktx than 1.10.1 is available: 1.18.0">
+        <fix-replace
+            description="Change to 1.18.0"
+            family="Update versions"
+            oldString="1.10.1"
+            replacement="1.18.0"
+            priority="0"/>
+        <location
+            file="$HOME/Downloads/CatalentOneHub/gradle/libs.versions.toml"
+            line="8"
+            column="11"
+            startOffset="132"
+            endLine="8"
+            endColumn="19"
+            endOffset="140"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of androidx.test.ext:junit than 1.1.5 is available: 1.3.0">
+        <fix-replace
+            description="Change to 1.3.0"
+            family="Update versions"
+            oldString="1.1.5"
+            replacement="1.3.0"
+            priority="0"/>
+        <location
+            file="$HOME/Downloads/CatalentOneHub/gradle/libs.versions.toml"
+            line="10"
+            column="16"
+            startOffset="173"
+            endLine="10"
+            endColumn="23"
+            endOffset="180"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of androidx.test.espresso:espresso-core than 3.5.1 is available: 3.7.0">
+        <fix-replace
+            description="Change to 3.7.0"
+            family="Update versions"
+            oldString="3.5.1"
+            replacement="3.7.0"
+            priority="0"/>
+        <location
+            file="$HOME/Downloads/CatalentOneHub/gradle/libs.versions.toml"
+            line="11"
+            column="16"
+            startOffset="196"
+            endLine="11"
+            endColumn="23"
+            endOffset="203"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of androidx.lifecycle:lifecycle-runtime-ktx than 2.6.1 is available: 2.10.0">
+        <fix-replace
+            description="Change to 2.10.0"
+            family="Update versions"
+            oldString="2.6.1"
+            replacement="2.10.0"
+            priority="0"/>
+        <location
+            file="$HOME/Downloads/CatalentOneHub/gradle/libs.versions.toml"
+            line="12"
+            column="23"
+            startOffset="226"
+            endLine="12"
+            endColumn="30"
+            endOffset="233"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of androidx.activity:activity-compose than 1.8.0 is available: 1.13.0">
+        <fix-replace
+            description="Change to 1.13.0"
+            family="Update versions"
+            oldString="1.8.0"
+            replacement="1.13.0"
+            priority="0"/>
+        <location
+            file="$HOME/Downloads/CatalentOneHub/gradle/libs.versions.toml"
+            line="13"
+            column="19"
+            startOffset="252"
+            endLine="13"
+            endColumn="26"
+            endOffset="259"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of androidx.compose:compose-bom than 2024.09.00 is available: 2026.05.01">
+        <fix-replace
+            description="Change to 2026.05.01"
+            family="Update versions"
+            oldString="2024.09.00"
+            replacement="2026.05.01"
+            priority="0"/>
+        <location
+            file="$HOME/Downloads/CatalentOneHub/gradle/libs.versions.toml"
+            line="14"
+            column="14"
+            startOffset="273"
+            endLine="14"
+            endColumn="26"
+            endOffset="285"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of org.jetbrains.kotlin.jvm than 2.2.10 is available: 2.3.21">
+        <fix-replace
+            description="Change to 2.3.21"
+            family="Update versions"
+            oldString="2.2.10"
+            replacement="2.3.21"
+            priority="0"/>
+        <location
+            file="$HOME/Downloads/CatalentOneHub/gradle/libs.versions.toml"
+            line="15"
+            column="22"
+            startOffset="307"
+            endLine="15"
+            endColumn="30"
+            endOffset="315"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of androidx.appcompat:appcompat than 1.6.1 is available: 1.7.1">
+        <fix-replace
+            description="Change to 1.7.1"
+            family="Update versions"
+            oldString="1.6.1"
+            replacement="1.7.1"
+            priority="0"/>
+        <location
+            file="$HOME/Downloads/CatalentOneHub/gradle/libs.versions.toml"
+            line="17"
+            column="13"
+            startOffset="352"
+            endLine="17"
+            endColumn="20"
+            endOffset="359"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of com.google.android.material:material than 1.10.0 is available: 1.14.0">
+        <fix-replace
+            description="Change to 1.14.0"
+            family="Update versions"
+            oldString="1.10.0"
+            replacement="1.14.0"
+            priority="0"/>
+        <location
+            file="$HOME/Downloads/CatalentOneHub/gradle/libs.versions.toml"
+            line="18"
+            column="12"
+            startOffset="371"
+            endLine="18"
+            endColumn="20"
+            endOffset="379"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of com.android.tools:common than 31.13.0 is available: 32.2.1">
+        <fix-replace
+            description="Change to 32.2.1"
+            family="Update versions"
+            oldString="31.13.0"
+            replacement="32.2.1"
+            priority="0"/>
+        <location
+            file="$HOME/Downloads/CatalentOneHub/gradle/libs.versions.toml"
+            line="19"
+            column="16"
+            startOffset="395"
+            endLine="19"
+            endColumn="25"
+            endOffset="404"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of androidx.room:room-gradle-plugin than 2.8.0 is available: 2.8.4">
+        <fix-replace
+            description="Change to 2.8.4"
+            family="Update versions"
+            oldString="2.8.0"
+            replacement="2.8.4"
+            priority="0"/>
+        <location
+            file="$HOME/Downloads/CatalentOneHub/gradle/libs.versions.toml"
+            line="20"
+            column="8"
+            startOffset="412"
+            endLine="20"
+            endColumn="15"
+            endOffset="419"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of androidx.lifecycle:lifecycle-viewmodel-compose than 2.8.6 is available: 2.10.0">
+        <fix-replace
+            description="Change to 2.10.0"
+            family="Update versions"
+            oldString="2.8.6"
+            replacement="2.10.0"
+            priority="0"/>
+        <location
+            file="$HOME/Downloads/CatalentOneHub/gradle/libs.versions.toml"
+            line="21"
+            column="13"
+            startOffset="432"
+            endLine="21"
+            endColumn="20"
+            endOffset="439"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of androidx.lifecycle:lifecycle-viewmodel-ktx than 2.8.6 is available: 2.10.0">
+        <fix-replace
+            description="Change to 2.10.0"
+            family="Update versions"
+            oldString="2.8.6"
+            replacement="2.10.0"
+            priority="0"/>
+        <location
+            file="$HOME/Downloads/CatalentOneHub/gradle/libs.versions.toml"
+            line="21"
+            column="13"
+            startOffset="432"
+            endLine="21"
+            endColumn="20"
+            endOffset="439"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of androidx.compose.material:material than 1.7.8 is available: 1.11.2">
+        <fix-replace
+            description="Change to 1.11.2"
+            family="Update versions"
+            oldString="1.7.8"
+            replacement="1.11.2"
+            priority="0"/>
+        <location
+            file="$HOME/Downloads/CatalentOneHub/gradle/libs.versions.toml"
+            line="31"
+            column="19"
+            startOffset="703"
+            endLine="31"
+            endColumn="26"
+            endOffset="710"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of com.google.android.material:material than 1.13.0 is available: 1.14.0">
+        <fix-replace
+            description="Change to 1.14.0"
+            family="Update versions"
+            oldString="1.13.0"
+            replacement="1.14.0"
+            priority="0"/>
+        <location
+            file="$HOME/Downloads/CatalentOneHub/gradle/libs.versions.toml"
+            line="32"
+            column="19"
+            startOffset="729"
+            endLine="32"
+            endColumn="27"
+            endOffset="737"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of androidx.hilt:hilt-navigation-compose than 1.2.0 is available: 1.3.0">
+        <fix-replace
+            description="Change to 1.3.0"
+            family="Update versions"
+            oldString="1.2.0"
+            replacement="1.3.0"
+            priority="0"/>
+        <location
+            file="$HOME/Downloads/CatalentOneHub/gradle/libs.versions.toml"
+            line="55"
+            column="89"
+            startOffset="2767"
+            endLine="55"
+            endColumn="96"
+            endOffset="2774"/>
+    </incident>
+
+    <incident
+        id="SimilarGradleDependency"
+        severity="informational"
+        message="There are multiple dependencies androidx.core:core-ktx but with different version">
+        <location
+            file="$HOME/Downloads/CatalentOneHub/gradle/libs.versions.toml"
+            line="35"
+            column="22"
+            startOffset="772"
+            endLine="35"
+            endColumn="92"
+            endOffset="842"/>
+    </incident>
+
+    <incident
+        id="SimilarGradleDependency"
+        severity="informational"
+        message="There are multiple dependencies com.google.android.material:material but with different version">
+        <location
+            file="$HOME/Downloads/CatalentOneHub/gradle/libs.versions.toml"
+            line="51"
+            column="13"
+            startOffset="2330"
+            endLine="51"
+            endColumn="98"
+            endOffset="2415"/>
+    </incident>
+
+    <incident
+        id="SimilarGradleDependency"
+        severity="informational"
+        message="There are multiple dependencies androidx.lifecycle:lifecycle-viewmodel-ktx but with different version">
+        <location
+            file="$HOME/Downloads/CatalentOneHub/gradle/libs.versions.toml"
+            line="57"
+            column="37"
+            startOffset="2937"
+            endLine="57"
+            endColumn="120"
+            endOffset="3020"/>
+    </incident>
+
+    <incident
+        id="SimilarGradleDependency"
+        severity="informational"
+        message="There are multiple dependencies com.google.android.material:material but with different version">
+        <location
+            file="$HOME/Downloads/CatalentOneHub/gradle/libs.versions.toml"
+            line="61"
+            column="21"
+            startOffset="3439"
+            endLine="61"
+            endColumn="113"
+            endOffset="3531"/>
+    </incident>
+
+    <incident
+        id="SimilarGradleDependency"
+        severity="informational"
+        message="There are multiple dependencies androidx.lifecycle:lifecycle-viewmodel-ktx but with different version">
+        <location
+            file="$HOME/Downloads/CatalentOneHub/gradle/libs.versions.toml"
+            line="69"
+            column="28"
+            startOffset="4107"
+            endLine="69"
+            endColumn="132"
+            endOffset="4211"/>
+    </incident>
+
+    <incident
+        id="SimilarGradleDependency"
+        severity="informational"
+        message="There are multiple dependencies androidx.core:core-ktx but with different version">
+        <location
+            file="$HOME/Downloads/CatalentOneHub/gradle/libs.versions.toml"
+            line="70"
+            column="13"
+            startOffset="4224"
+            endLine="70"
+            endColumn="90"
+            endOffset="4301"/>
+    </incident>
+
+    <incident
+        id="UsingMaterialAndMaterial3Libraries"
+        severity="warning"
+        message="Using a material import while also using the material3 library">
+        <location
+            file="${:app*devDebug*MAIN*sourceProvider*0*javaDir*0}/com/catalent/onehub/presentation/ui/MainActivity.kt"
+            line="9"
+            column="8"
+            startOffset="299"
+            endLine="9"
+            endColumn="45"
+            endOffset="336"/>
+    </incident>
+
+    <incident
+        id="UsingMaterialAndMaterial3Libraries"
+        severity="warning"
+        message="Using a material import while also using the material3 library">
+        <location
+            file="${:app*devDebug*MAIN*sourceProvider*0*javaDir*0}/com/catalent/onehub/presentation/ui/MainActivity.kt"
+            line="10"
+            column="8"
+            startOffset="344"
+            endLine="10"
+            endColumn="59"
+            endOffset="395"/>
+    </incident>
+
+    <incident
+        id="UsingMaterialAndMaterial3Libraries"
+        severity="warning"
+        message="Using a material import while also using the material3 library">
+        <location
+            file="${:app*devDebug*MAIN*sourceProvider*0*javaDir*0}/com/catalent/onehub/presentation/ui/MainActivity.kt"
+            line="11"
+            column="8"
+            startOffset="403"
+            endLine="11"
+            endColumn="38"
+            endOffset="433"/>
+    </incident>
+
+    <incident
+        id="UsingMaterialAndMaterial3Libraries"
+        severity="warning"
+        message="Using a material import while also using the material3 library">
+        <location
+            file="${:app*devDebug*MAIN*sourceProvider*0*javaDir*0}/com/catalent/onehub/presentation/ui/MainActivity.kt"
+            line="12"
+            column="8"
+            startOffset="441"
+            endLine="12"
+            endColumn="44"
+            endOffset="477"/>
+    </incident>
+
+    <incident
+        id="ObsoleteSdkInt"
+        severity="warning"
+        message="Unnecessary; `SDK_INT` is always >= 32">
+        <fix-data conditional="true"/>
+        <location
+            file="${:app*devDebug*MAIN*sourceProvider*0*javaDir*0}/com/catalent/onehub/ui/theme/Theme.kt"
+            line="43"
+            column="19"
+            startOffset="1227"
+            endLine="43"
+            endColumn="65"
+            endOffset="1273"/>
+    </incident>
+
+</incidents>

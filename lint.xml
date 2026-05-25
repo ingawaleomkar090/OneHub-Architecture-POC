@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lint>
+    <!-- Suppress lint in generated code -->
+    <issue id="all">
+        <ignore path="**/build/**" />
+        <ignore path="**/.gradle/**" />
+    </issue>
+
+    <!-- Allow using experimental Compose APIs -->
+    <issue id="UnsafeOptInUsageError" severity="ignore" />
+
+    <!-- Allow pull refresh experimental -->
+    <issue id="ExperimentalMaterialApi" severity="ignore" />
+
+    <!-- Enforce no hardcoded colors in Compose — use MaterialTheme -->
+    <issue id="HardcodedText" severity="error" />
+
+    <!-- Allow missing content description on decorative icons -->
+    <issue id="ContentDescription" severity="warning" />
+</lint>

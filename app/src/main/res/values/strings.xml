@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">CatalentOneHub</string>
+    <string name="welcome">Welcome %s</string>
+    <string name="logout_button">Logout</string>
+    <string name="fetch_contacts_button">Contacts</string>
+    <string name="fetch_accounts_button">Accounts</string>
+    <string name="clear_button">Clear</string>
+    <string name="title_error">Error</string>
+
+    <!-- Error Messages -->
+    <string name="error_unknown">Something went wrong</string>
+    <string name="error_invalid_credentials">Invalid credentials. Please try again.</string>
+    <string name="error_session_expired">Session expired. Please sign in again.</string>
+    <string name="error_network">You\'re offline. Showing cached data.</string>
+    <string name="error_logout_failed">Logout failed. Please try again.</string>
+
+    <!-- Add other strings with groups as per usage or module with comment -->
+</resources>

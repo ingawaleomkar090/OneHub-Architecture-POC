@@ -1,0 +1,27 @@
+# Android generated
+*.iml
+.gradle
+/build
+/captures
+.externalNativeBuild
+.cxx
+
+# Local configuration — never commit
+local.properties
+
+# Salesforce credentials — never commit
+app/src/main/res/values/bootconfig.xml
+
+# IDE
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+
+# macOS
+.DS_Store
+
+# Lint reports
+/reports/

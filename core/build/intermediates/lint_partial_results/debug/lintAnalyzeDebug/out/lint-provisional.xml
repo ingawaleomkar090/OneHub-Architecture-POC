@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<incidents format="6" by="lint 8.9.1" type="conditional_incidents">
+
+    <incident
+        id="MissingPermission"
+        severity="error"
+        message="">
+        <fix-data missing="android.permission.ACCESS_NETWORK_STATE" message="Missing permissions required by ConnectivityManager.registerNetworkCallback: %1$s" lastApi="2147483647" operator="&amp;"/>
+        <location
+            file="${:core*debug*MAIN*sourceProvider*0*javaDir*0}/com/catalent/core/network/NetworkManager.kt"
+            line="31"
+            column="9"
+            startOffset="1154"
+            endLine="31"
+            endColumn="71"
+            endOffset="1216"/>
+        <map>
+            <entry
+                name="message"
+                string="Missing permissions required by ConnectivityManager.registerNetworkCallback: %1$s"/>
+            <entry
+                name="requirement"
+                string="android.permission.ACCESS_NETWORK_STATE"/>
+        </map>
+    </incident>
+
+    <incident
+        id="MissingPermission"
+        severity="error"
+        message="">
+        <fix-data missing="android.permission.ACCESS_NETWORK_STATE" message="Missing permissions required by ConnectivityManager.getActiveNetwork: %1$s" lastApi="2147483647" operator="&amp;"/>
+        <location
+            file="${:core*debug*MAIN*sourceProvider*0*javaDir*0}/com/catalent/core/network/NetworkManager.kt"
+            line="37"
+            column="23"
+            startOffset="1430"
+            endLine="37"
+            endColumn="56"
+            endOffset="1463"/>
+        <map>
+            <entry
+                name="message"
+                string="Missing permissions required by ConnectivityManager.getActiveNetwork: %1$s"/>
+            <entry
+                name="requirement"
+                string="android.permission.ACCESS_NETWORK_STATE"/>
+        </map>
+    </incident>
+
+    <incident
+        id="MissingPermission"
+        severity="error"
+        message="">
+        <fix-data missing="android.permission.ACCESS_NETWORK_STATE" message="Missing permissions required by ConnectivityManager.getNetworkCapabilities: %1$s" lastApi="2147483647" operator="&amp;"/>
+        <location
+            file="${:core*debug*MAIN*sourceProvider*0*javaDir*0}/com/catalent/core/network/NetworkManager.kt"
+            line="38"
+            column="20"
+            startOffset="1499"
+            endLine="38"
+            endColumn="71"
+            endOffset="1550"/>
+        <map>
+            <entry
+                name="message"
+                string="Missing permissions required by ConnectivityManager.getNetworkCapabilities: %1$s"/>
+            <entry
+                name="requirement"
+                string="android.permission.ACCESS_NETWORK_STATE"/>
+        </map>
+    </incident>
+
+</incidents>

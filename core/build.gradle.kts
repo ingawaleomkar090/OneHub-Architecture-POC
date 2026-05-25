@@ -1,0 +1,56 @@
+plugins {
+	alias(libs.plugins.android.library)
+	alias(libs.plugins.kotlin.android)
+	alias(libs.plugins.hilt)
+	alias(libs.plugins.ksp)
+}
+
+android {
+	namespace = "com.catalent.core"
+	compileSdk = 36
+
+	defaultConfig {
+		minSdk = 32
+
+		testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+		consumerProguardFiles("consumer-rules.pro")
+	}
+
+	buildTypes {
+		release {
+			isMinifyEnabled = false
+			proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+		}
+	}
+	compileOptions {
+		sourceCompatibility = JavaVersion.VERSION_17
+		targetCompatibility = JavaVersion.VERSION_17
+	}
+	kotlinOptions {
+		jvmTarget = "17"
+	}
+}
+
+dependencies {
+	// Lifecycle
+	api(libs.androidx.lifecycle.viewmodel.ktx)
+	api(libs.androidx.lifecycle.viewmodel.compose)
+
+	// Hilt
+	api(libs.hilt.android)
+	ksp(libs.hilt.compiler)
+
+	// Salesforce
+	api(libs.salesforce.mobile.sync)
+
+	// Logging
+	api(libs.timber)
+
+	// Android
+	implementation(libs.androidx.core.ktx)
+
+	// Test
+	testImplementation(libs.junit)
+	androidTestImplementation(libs.androidx.junit)
+	androidTestImplementation(libs.androidx.espresso.core)
+}
