@@ -6,6 +6,7 @@ plugins {
 	alias(libs.plugins.hilt)
 	alias(libs.plugins.ksp)
 	alias(libs.plugins.kotlin.android)
+	alias(libs.plugins.kotlin.serialization)
 }
 
 val localProperties = Properties().apply {
@@ -170,6 +171,11 @@ dependencies {
 
 	// Internal modules
 	implementation(projects.core)
+
+	//Navigation 3
+	implementation(libs.androidx.navigation3.runtime)
+	implementation(libs.androidx.navigation3.ui)
+	implementation(libs.androidx.lifecycle.viewmodel.navigation3)
 
 	implementation(projects.auth.domain)
 	implementation(projects.auth.ui)

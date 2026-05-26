@@ -23,6 +23,7 @@ import com.catalent.auth.ui.AuthViewModel
 import com.catalent.core.network.ClientProvider
 import com.catalent.core.network.RawClientWrapper
 import com.catalent.core.network.NetworkManager
+import com.catalent.onehub.navigation.OneHubNavGraph
 import com.catalent.onehub.presentation.error.toStringRes
 import com.catalent.onehub.presentation.screen.ErrorScreen
 import com.catalent.onehub.presentation.screen.HomeScreen
@@ -94,7 +95,7 @@ fun CatalentOneHubContent(
         }
 
         when (val state = authState) {
-            is AuthState.Authenticated -> HomeScreen(
+            is AuthState.Authenticated -> OneHubNavGraph(
                 isConnected = isConnected,
                 onLogout = { authViewModel.logout() }
             )

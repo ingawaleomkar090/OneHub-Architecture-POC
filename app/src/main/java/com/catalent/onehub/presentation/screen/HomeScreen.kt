@@ -4,6 +4,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
+import androidx.compose.material.icons.filled.LocalShipping
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -31,6 +33,8 @@ import com.catalent.shipment.ui.presentation.viewmodel.SObjectListViewModel
 fun HomeScreen(
 	isConnected: Boolean,
 	onLogout: () -> Unit,
+	onNavigateToShipment: () -> Unit = {},
+	onNavigateToNotification: () -> Unit = {},
 	viewModel: SObjectListViewModel = hiltViewModel(),
 ) {
 	var selectedTabIndex by remember { mutableIntStateOf(0) }
@@ -56,6 +60,12 @@ fun HomeScreen(
 				TopAppBar(
 					title = { Text("Salesforce POC") },
 					actions = {
+						IconButton(onClick = onNavigateToShipment) {
+							Icon(Icons.Default.LocalShipping, contentDescription = "Shipment")
+						}
+						IconButton(onClick = onNavigateToNotification) {
+							Icon(Icons.Default.Notifications, contentDescription = "Notification")
+						}
 						IconButton(onClick = onLogout) {
 							Icon(Icons.AutoMirrored.Filled.ExitToApp, contentDescription = "Logout")
 						}
