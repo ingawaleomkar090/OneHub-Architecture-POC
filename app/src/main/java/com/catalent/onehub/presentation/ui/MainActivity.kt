@@ -10,11 +10,13 @@ import androidx.compose.material.AlertDialog
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.compose.LifecycleResumeEffect
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.catalent.onehub.R
 import com.catalent.auth.domain.AuthState
 import com.catalent.auth.ui.AuthViewModel
@@ -41,50 +43,24 @@ class MainActivity : SalesforceActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-    }
-
-    override fun onResume(client: RestClient) {
-        clientProvider.onClientAvailable(RawClientWrapper(client))
 
         setContent {
-            val authState by authViewModel.authState.collectAsState()
-            val errorState by authViewModel.errorState.collectAsState()
-            val isConnected by networkManager.observeConnectivity.collectAsState(initial = true)
-
-            CatalentOneHubTheme {
-                errorState?.let { error ->
-                    AlertDialog(
-                        onDismissRequest = { authViewModel.clearError() },
-                        title = { Text(stringResource(R.string.title_error)) },
-                        text = { Text(stringResource(error.toStringRes())) },
-                        confirmButton = {
-                            TextButton(onClick = { authViewModel.clearError() }) {
-                                Text("OK")
-                            }
-                        }
-                    )
-                }
-
-                when (val state = authState) {
-                    is AuthState.Authenticated -> HomeScreen(
-                        isConnected = isConnected,
-                        onLogout = { authViewModel.logout() }
-                    )
-
-                    is AuthState.Error -> ErrorScreen(
-                        message = stringResource(state.exception.toStringRes()),
-                        onRetry = { authViewModel.logout() }
-                    )
-
-                    is AuthState.Unauthenticated,
-                    is AuthState.Loading -> {
-                        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                            CircularProgressIndicator()
-                        }
-                    }
-                }
-            }
+            CatalentOneHubContent(
+                clientProvider = clientProvider,
+                networkManager = networkManager,
+                authViewModel = authViewModel
+            )
         }
+    }
+
+    /**
+     * SalesforceActivity provides the RestClient here.
+     * We use LifecycleResumeEffect to manage the ClientProvider lifecycle
+     * within the Compose composition, following modern best practices.
+     */
+    override fun onResume(client: RestClient) {
+        // We still need this to capture the client from Salesforce SDK
+        clientProvider.onClientAvailable(RawClientWrapper(client))
     }
 
     override fun onPause() {
@@ -93,4 +69,47 @@ class MainActivity : SalesforceActivity() {
     }
 }
 
+@Composable
+fun CatalentOneHubContent(
+    clientProvider: ClientProvider,
+    networkManager: NetworkManager,
+    authViewModel: AuthViewModel
+) {
+    val authState by authViewModel.authState.collectAsStateWithLifecycle(AuthState.Unauthenticated)
+    val errorState by authViewModel.errorState.collectAsStateWithLifecycle(null)
+    val isConnected by networkManager.observeConnectivity.collectAsStateWithLifecycle(initialValue = true)
 
+    CatalentOneHubTheme {
+        errorState?.let { error ->
+            AlertDialog(
+                onDismissRequest = { authViewModel.clearError() },
+                title = { Text(stringResource(R.string.title_error)) },
+                text = { Text(stringResource(error.toStringRes())) },
+                confirmButton = {
+                    TextButton(onClick = { authViewModel.clearError() }) {
+                        Text("OK")
+                    }
+                }
+            )
+        }
+
+        when (val state = authState) {
+            is AuthState.Authenticated -> HomeScreen(
+                isConnected = isConnected,
+                onLogout = { authViewModel.logout() }
+            )
+
+            is AuthState.Error -> ErrorScreen(
+                message = stringResource(state.exception.toStringRes()),
+                onRetry = { authViewModel.logout() }
+            )
+
+            is AuthState.Unauthenticated,
+            is AuthState.Loading -> {
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
+                }
+            }
+        }
+    }
+}

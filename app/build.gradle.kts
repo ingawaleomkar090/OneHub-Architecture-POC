@@ -138,6 +138,7 @@ dependencies {
 	// Core Android
 	implementation(libs.androidx.core.ktx)
 	implementation(libs.androidx.lifecycle.runtime.ktx)
+	implementation(libs.androidx.lifecycle.runtime.compose)
 	implementation(libs.androidx.activity.compose)
 
 	// Compose
@@ -158,6 +159,11 @@ dependencies {
 	implementation(libs.hilt.android)
 	ksp(libs.hilt.compiler)
 	implementation(libs.hilt.navigation.compose)
+	implementation(libs.androidx.hilt.work)
+	ksp(libs.androidx.hilt.compiler)
+
+	// WorkManager
+	implementation(libs.androidx.work.runtime.ktx)
 
 	// Salesforce
 	implementation(libs.salesforce.mobile.sync)

@@ -14,15 +14,16 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.catalent.onehub.presentation.components.NetworkBanner
 import com.catalent.onehub.presentation.components.SObjectList
+import com.catalent.shipment.domain.model.SObjectListState
 import com.catalent.shipment.ui.presentation.viewmodel.SObjectListViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -36,8 +37,8 @@ fun HomeScreen(
 	val tabs = listOf("Contacts", "Accounts")
 	val sObjectType = if (selectedTabIndex == 0) "Contact" else "Account"
 
-	val contactsState by viewModel.contactsState.collectAsState()
-	val accountsState by viewModel.accountsState.collectAsState()
+	val contactsState by viewModel.contactsState.collectAsStateWithLifecycle(SObjectListState())
+	val accountsState by viewModel.accountsState.collectAsStateWithLifecycle(SObjectListState())
 	val currentState = if (selectedTabIndex == 0) contactsState else accountsState
 
 	LaunchedEffect(Unit) {
