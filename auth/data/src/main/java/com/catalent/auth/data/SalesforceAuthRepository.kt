@@ -3,6 +3,7 @@ package com.catalent.auth.data
 import com.catalent.auth.data.mapper.AuthExceptionMapper
 import com.catalent.auth.domain.AuthRepository
 import com.catalent.auth.domain.AuthState
+import com.catalent.core.common.AppDispatchers
 import com.catalent.core.network.ClientProvider
 import com.catalent.core.network.RawClientWrapper
 import com.salesforce.androidsdk.app.SalesforceSDKManager
@@ -11,10 +12,12 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
 
 @Singleton
 class SalesforceAuthRepository @Inject constructor(
     private val clientProvider: ClientProvider,
+    private val dispatchers: AppDispatchers,
 ) : AuthRepository {
 
     override val authState: Flow<AuthState> = clientProvider.client.map { clientWrapper ->
@@ -37,7 +40,7 @@ class SalesforceAuthRepository @Inject constructor(
         }
     }
 
-    override suspend fun logout() {
+    override suspend fun logout() = withContext(dispatchers.io) {
         try {
             SalesforceSDKManager.getInstance().logout(null)
             clientProvider.onClientRemoved()

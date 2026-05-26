@@ -1,5 +1,6 @@
 package com.catalent.shipment.data.repository
 
+import com.catalent.core.common.AppDispatchers
 import com.catalent.core.logging.Loggable
 import com.catalent.core.network.ClientProvider
 import com.catalent.shipment.domain.model.SObjectData
@@ -16,7 +17,6 @@ import com.salesforce.androidsdk.smartstore.store.SmartStore
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.coroutines.resume
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.emitAll
@@ -29,7 +29,8 @@ import kotlinx.coroutines.withContext
 
 @Singleton
 class SalesforceSObjectRepository @Inject constructor(
-    private val clientProvider: ClientProvider
+    private val clientProvider: ClientProvider,
+    private val dispatchers: AppDispatchers
 ) : SObjectRepository, Loggable {
 
     // A simple trigger to refresh the flow when local data changes
@@ -54,12 +55,12 @@ class SalesforceSObjectRepository @Inject constructor(
             }
         
         emitAll(internalFlow)
-    }.flowOn(Dispatchers.IO)
+    }.flowOn(dispatchers.io)
 
     override suspend fun sync(
         sObjectType: String,
         displayField: String
-    ) = withContext(Dispatchers.IO) {
+    ) = withContext(dispatchers.io) {
         registerSoup(sObjectType, displayField)
         
         val syncManager = SyncManager.getInstance(account)
@@ -87,7 +88,7 @@ class SalesforceSObjectRepository @Inject constructor(
     private suspend fun registerSoup(
         sObjectType: String,
         displayField: String,
-    ) = withContext(Dispatchers.IO) {
+    ) = withContext(dispatchers.io) {
         val soupName = getSoupName(sObjectType)
         if (!smartStore.hasSoup(soupName)) {
             val indexSpecs = arrayOf(
