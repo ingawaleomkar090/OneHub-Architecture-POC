@@ -1,6 +1,8 @@
 package com.catalent.core.logging
 
 import android.content.Context
+import timber.log.Timber
+import java.io.File
 
 object AppLogger : OneHubLogger {
 
@@ -9,6 +11,13 @@ object AppLogger : OneHubLogger {
 
     fun init(context: Context, enableLogging: Boolean = true) {
         consoleLogger = ConsoleLogger()
+        if (enableLogging) {
+            Timber.plant(Timber.DebugTree())
+
+            val logDir = File(context.filesDir, "logs")
+            Timber.plant(FileLoggingTree(logDir))
+        }
+
         val list = buildList {
             if (enableLogging) add(consoleLogger)
         }
