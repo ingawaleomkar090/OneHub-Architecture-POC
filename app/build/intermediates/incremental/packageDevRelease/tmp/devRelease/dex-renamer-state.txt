@@ -1,4 +1,0 @@
-#Fri May 22 17:00:10 IST 2026
-base.0=/Users/pandit_m/Downloads/CatalentOneHub/app/build/intermediates/dex/devRelease/minifyDevReleaseWithR8/classes.dex
-path.0=classes.dex
-renamed.0=classes.dex
