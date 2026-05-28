@@ -47,10 +47,10 @@ class SalesforceSObjectRepository @Inject constructor(
         displayField: String,
         searchQuery: String
     ): Flow<List<SObjectData>> = flow {
-        // Create an internal flow that emits whenever the trigger is pulled
         val internalFlow = refreshTrigger
-            .onStart { emit(Unit) } // Emit immediately on start
+            .onStart { emit(Unit) }
             .map {
+                d("getSObjects","displayField--> $displayField \t  searchQuery--> $searchQuery")
                 loadFromSmartStore(sObjectType, displayField, searchQuery)
             }
         
@@ -73,7 +73,7 @@ class SalesforceSObjectRepository @Inject constructor(
             syncManager.syncDown(target, options, soupName, object : SyncManager.SyncUpdateCallback {
                 override fun onUpdate(syncState: SyncState) {
                     if (syncState.isDone) {
-                        d("sync", "syncDown completed for $sObjectType")
+                        d("sync", "syncDown completed for-->  $sObjectType")
                         refreshTrigger.tryEmit(Unit)
                         if (continuation.isActive) continuation.resume(Unit)
                     } else if (syncState.status == SyncState.Status.FAILED) {

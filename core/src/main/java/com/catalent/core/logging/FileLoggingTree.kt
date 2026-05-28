@@ -7,6 +7,7 @@ import java.io.File
 import java.io.FileWriter
 import java.io.IOException
 import java.time.Instant
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
@@ -18,9 +19,8 @@ import java.util.concurrent.Executors
  * Requirements:
  * 1. File Rolling: Max 5MB per file, max 10 files, FIFO rotation via timestamps.
  * 2. Retention: Deletes files older than 7 days.
- * 3. Performance: Thread-safe, non-blocking via single-thread executor.
- * 4. Formatting: yyyy-MM-dd HH:mm:ss.SSS LEVEL/TAG: MESSAGE
- * 5. File Name: log_yyyyMMdd_HHmmss.log
+ * 3. Formatting: yyyy-MM-dd HH:mm:ss.SSS LEVEL/TAG: MESSAGE
+ * 4. File Name: log_yyyyMMdd_HHmmss.log
  */
 class FileLoggingTree(private val logDir: File) : Timber.Tree() {
 
@@ -39,7 +39,7 @@ class FileLoggingTree(private val logDir: File) : Timber.Tree() {
         private const val RETENTION_DAYS  = 7L
         private const val PREFIX          = "log_"
         private const val EXTENSION       = ".log"
-        private const val CLEANUP_INTERVAL_MS = 6 * 60 * 60 * 1000L // every 6 hrs
+        private const val CLEANUP_INTERVAL_MS = 6 * 60 * 60 * 1000L
     }
 
     private var lastCleanupTime = 0L
@@ -88,20 +88,28 @@ class FileLoggingTree(private val logDir: File) : Timber.Tree() {
 
     /**
      * Returns the current BufferedWriter, rotating to a new file if the
-     * active file has reached MAX_FILE_SIZE.
+     * active file has reached MAX_FILE_SIZE or if the day has changed.
      */
     private fun getOrRotateWriter(): BufferedWriter {
+        val today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"))
+
         if (currentFile == null) {
-            val latest = logFiles().sortedBy { it.name }.lastOrNull()
-            if (latest != null && latest.length() < MAX_FILE_SIZE) {
+            val latest = logFiles().maxByOrNull { it.name }
+            if (latest != null && latest.length() < MAX_FILE_SIZE && isFileFromToday(latest, today)) {
                 currentFile = latest
             }
         }
+
         val active = currentFile
-        if (active != null && active.length() < MAX_FILE_SIZE) {
+        if (active != null && active.length() < MAX_FILE_SIZE && isFileFromToday(active, today)) {
             return bufferedWriter ?: openWriter(active)
         }
         return rotate()
+    }
+
+    private fun isFileFromToday(file: File, today: String): Boolean {
+        // Filename format: log_yyyyMMdd_HHmmss.log
+        return file.name.startsWith("$PREFIX$today")
     }
 
     private fun rotate(): BufferedWriter {
