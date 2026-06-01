@@ -5,7 +5,6 @@ plugins {
 	alias(libs.plugins.kotlin.compose)
 	alias(libs.plugins.hilt)
 	alias(libs.plugins.ksp)
-	alias(libs.plugins.kotlin.android)
 }
 
 val localProperties = Properties().apply {
@@ -95,14 +94,13 @@ android {
 	buildFeatures {
 		compose = true
 		buildConfig = true
+		resValues = true
 	}
 
 	compileOptions {
 		sourceCompatibility = JavaVersion.VERSION_17
 		targetCompatibility = JavaVersion.VERSION_17
 	}
-
-	kotlinOptions { jvmTarget = "17" }
 
 	lint {
 		// errors that should break the build
@@ -131,6 +129,12 @@ android {
 		xmlReport = true
 		htmlOutput = file("${rootProject.projectDir}/reports/lint/app-lint-report.html")
 		xmlOutput = file("${rootProject.projectDir}/reports/lint/app-lint-report.xml")
+	}
+}
+
+kotlin {
+	compilerOptions {
+		jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
 	}
 }
 

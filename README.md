@@ -216,12 +216,12 @@ Create or update `local.properties` in the root folder:
 ```properties
 # local.properties — never commit this file
 salesforce.consumer.key=YOUR_CONSUMER_KEY
-salesforce.redirect.uri=fieldagentapp://mobile/oauth/onehub
+salesforce.redirect.uri=REDIRECT_URI
 ```
 
 **3. Configure Salesforce Connected App**
 In your Salesforce org go to `Setup → App Manager → New Connected App`:
-* **Callback URL**: `fieldagentapp://mobile/oauth/onehub`
+* **Callback URL**: `REDIRECT_URI`
 * **OAuth Scopes**: `api`, `web`, `refresh_token`, `openid`
 * **Permitted Users**: All users may self-authorize
 * **IP Relaxation**: Relax IP restrictions
@@ -526,7 +526,11 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions { jvmTarget = "17" }
+    kotlin {
+        compilerOptions {
+            jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
+        }
+    }
 }
 dependencies {
     implementation(project(":feature:domain"))
@@ -555,7 +559,11 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions { jvmTarget = "17" }
+    kotlin {
+        compilerOptions {
+            jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
+        }
+    }
 }
 dependencies {
     implementation(project(":feature:domain"))

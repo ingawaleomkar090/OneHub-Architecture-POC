@@ -5,12 +5,11 @@ plugins {
 	alias(libs.plugins.hilt) apply false
 	alias(libs.plugins.ksp) apply false
 	alias(libs.plugins.jetbrains.kotlin.jvm) apply false
-	alias(libs.plugins.kotlin.android) apply false
 }
 
 subprojects {
 	plugins.withId("com.android.library") {
-		extensions.configure<com.android.build.gradle.LibraryExtension> {
+		extensions.configure<com.android.build.api.dsl.LibraryExtension> {
 			defaultConfig {
 				missingDimensionStrategy("environment", "dev")
 			}
@@ -27,7 +26,7 @@ subprojects {
 	}
 
 	plugins.withId("com.android.application") {
-		extensions.configure<com.android.build.gradle.internal.dsl.BaseAppModuleExtension> {
+		extensions.configure<com.android.build.api.dsl.ApplicationExtension> {
 			lint {
 				warningsAsErrors = false
 				abortOnError = false
