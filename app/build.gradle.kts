@@ -23,7 +23,7 @@ val sfRedirectUri = localProperties.getProperty("salesforce.redirect.uri")
 
 android {
 	namespace = "com.catalent.onehub"
-	compileSdk = 36
+	compileSdk = 37
 
 	defaultConfig {
 		applicationId = "com.catalent.onehub"

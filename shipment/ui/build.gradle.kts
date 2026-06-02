@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace = "com.catalent.shipment.ui"
-    compileSdk = 36
+    compileSdk = 37
     defaultConfig { minSdk = 32 }
 
     buildFeatures { compose = true }
@@ -41,4 +41,9 @@ dependencies {
 
     // Lifecycle
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
+
+    // Test
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.espresso.core)
 }

@@ -6,7 +6,7 @@ plugins {
 
 android {
 	namespace = "com.catalent.auth.data"
-	compileSdk = 36
+	compileSdk = 37
 
 	defaultConfig {
 		minSdk = 32
@@ -47,4 +47,9 @@ dependencies {
 	// Hilt
 	implementation(libs.hilt.android)
 	ksp(libs.hilt.compiler)
+
+	// Test
+	testImplementation(libs.junit)
+	androidTestImplementation(libs.androidx.junit)
+	androidTestImplementation(libs.androidx.espresso.core)
 }

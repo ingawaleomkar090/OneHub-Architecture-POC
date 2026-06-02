@@ -6,7 +6,7 @@ plugins {
 
 android {
     namespace = "com.catalent.shipment.data"
-    compileSdk = 36
+    compileSdk = 37
     defaultConfig { minSdk = 32 }
 
     compileOptions {
@@ -35,4 +35,9 @@ dependencies {
 
     // Coroutines
     implementation(libs.kotlinx.coroutines.core)
+
+    // Test
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.espresso.core)
 }
