@@ -15,4 +15,5 @@
     <string name="error_logout_failed">Logout failed. Please try again.</string>
 
     <!-- Add other strings with groups as per usage or module with comment -->
+    <string name="title_activity_Welcome">WelcomeActivity</string>
 </resources>
