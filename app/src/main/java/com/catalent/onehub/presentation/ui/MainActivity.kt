@@ -6,21 +6,11 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
-//noinspection UsingMaterialAndMaterial3Libraries
-import androidx.compose.material.AlertDialog
-//noinspection UsingMaterialAndMaterial3Libraries
-import androidx.compose.material.CircularProgressIndicator
-//noinspection UsingMaterialAndMaterial3Libraries
-import androidx.compose.material.Text
-//noinspection UsingMaterialAndMaterial3Libraries
-import androidx.compose.material.TextButton
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -29,13 +19,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.core.content.edit
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.catalent.auth.domain.AuthState
 import com.catalent.auth.ui.AuthViewModel
@@ -43,6 +30,9 @@ import com.catalent.core.network.ClientProvider
 import com.catalent.core.network.NetworkManager
 import com.catalent.core.network.RawClientWrapper
 import com.catalent.onehub.R
+import com.catalent.onehub.presentation.biometric.BiometricEnrollmentBottomSheet
+import com.catalent.onehub.presentation.biometric.BiometricHelper
+import com.catalent.onehub.presentation.biometric.BiometricStatus
 import com.catalent.onehub.presentation.error.toStringRes
 import com.catalent.onehub.presentation.screen.ErrorScreen
 import com.catalent.onehub.presentation.screen.HomeScreen
@@ -57,37 +47,24 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class MainActivity : SalesforceActivity() {
 
-    @Inject lateinit var clientProvider: ClientProvider
-    @Inject lateinit var networkManager: NetworkManager
+    @Inject
+    lateinit var clientProvider: ClientProvider
+
+    @Inject
+    lateinit var networkManager: NetworkManager
 
     private val authViewModel: AuthViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-
         setContent {
-            CatalentOneHubContent(
-                clientProvider = clientProvider,
-                networkManager = networkManager,
-                authViewModel = authViewModel
-            )
+            CatalentOneHubContent(clientProvider, networkManager, authViewModel)
         }
     }
 
-    /**
-     * SalesforceActivity provides the RestClient here.
-     * We use LifecycleResumeEffect to manage the ClientProvider lifecycle
-     * within the Compose composition, following modern best practices.
-     */
     override fun onResume(client: RestClient) {
-        // We still need this to capture the client from Salesforce SDK
         clientProvider.onClientAvailable(RawClientWrapper(client))
-    }
-
-    override fun onPause() {
-        super.onPause()
-        clientProvider.onClientRemoved()
     }
 }
 
@@ -97,9 +74,13 @@ fun CatalentOneHubContent(
     networkManager: NetworkManager,
     authViewModel: AuthViewModel
 ) {
-    val authState by authViewModel.authState.collectAsStateWithLifecycle(AuthState.Unauthenticated)
+    val authState by authViewModel.authState.collectAsStateWithLifecycle()
     val errorState by authViewModel.errorState.collectAsStateWithLifecycle(null)
     val isConnected by networkManager.observeConnectivity.collectAsStateWithLifecycle(initialValue = true)
+
+    val context = LocalContext.current
+    val biometricHelper = remember { BiometricHelper(context) }
+    var isAppLocked by remember { mutableStateOf(false) }
 
     CatalentOneHubTheme {
         errorState?.let { error ->
@@ -117,20 +98,38 @@ fun CatalentOneHubContent(
 
         when (val state = authState) {
             is AuthState.Authenticated -> {
-                BiometricPromptLogic()
-                HomeScreen(
-                    isConnected = isConnected,
-                    onLogout = { authViewModel.logout() }
+                BiometricPromptLogic(
+                    biometricHelper = biometricHelper,
+                    authViewModel = authViewModel,
+                    onLockStateChange = { isAppLocked = it }
+                )
+
+                if (!isAppLocked) {
+                    HomeScreen(
+                        isConnected = isConnected,
+                        onLogout = { authViewModel.logout() }
+                    )
+                } else {
+                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator()
+                    }
+                }
+            }
+
+            AuthState.Unauthenticated -> {
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
+                }
+            }
+
+            is AuthState.Error -> {
+                ErrorScreen(
+                    message = state.message,
+                    onRetry = { /* Handle retry if necessary */ }
                 )
             }
 
-            is AuthState.Error -> ErrorScreen(
-                message = stringResource(state.exception.toStringRes()),
-                onRetry = { authViewModel.logout() }
-            )
-
-            is AuthState.Unauthenticated,
-            is AuthState.Loading -> {
+            AuthState.Loading -> {
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator()
                 }
@@ -140,93 +139,82 @@ fun CatalentOneHubContent(
 }
 
 @Composable
-fun BiometricPromptLogic() {
+fun BiometricPromptLogic(
+    biometricHelper: BiometricHelper,
+    authViewModel: AuthViewModel,
+    onLockStateChange: (Boolean) -> Unit
+) {
     val context = LocalContext.current
-    val biometricManager = remember {
+    val activity = context as FragmentActivity
+    val sfBiometricManager = remember {
         SalesforceSDKManager.getInstance().biometricAuthenticationManager
     }
     val prefs = remember {
         context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
     }
 
-    var showBiometricPrompt by remember { mutableStateOf(false) }
+    var showEnrollmentSheet by remember { mutableStateOf(false) }
+    var biometricStatus by remember { mutableStateOf(BiometricStatus.UNSUPPORTED) }
 
     LaunchedEffect(Unit) {
-        val optedIn = biometricManager?.hasBiometricOptedIn() == true
-        val alreadyPrompted = prefs.getBoolean("biometric_prompt_shown", false)
+        val status = biometricHelper.checkBiometricAvailability()
+        biometricStatus = status
 
-        Timber.tag("BIO_DEBUG").d("OptedIn: $optedIn")
-        Timber.tag("BIO_DEBUG").d("Enabled: ${biometricManager?.hasBiometricOptedIn()}")
-        Timber.tag("BIO_DEBUG").d("Locked: ${biometricManager?.locked}")
+        val isOptedIn = sfBiometricManager?.hasBiometricOptedIn() == true
+        val alreadyPrompted = prefs.getBoolean("biometric_enrollment_prompted", false)
 
-        if (!optedIn && !alreadyPrompted) {
-            showBiometricPrompt = true
+        if (isOptedIn && sfBiometricManager?.locked == true) {
+            onLockStateChange(true)
+            biometricHelper.showBiometricPrompt(
+                activity = activity,
+                onSuccess = {
+                    Timber.tag("BIO_AUTH").d("Authentication successful, unlocking app")
+                    onLockStateChange(false)
+                    // Sync Salesforce SDK state by calling internal onUnlock via reflection
+                    try {
+                        sfBiometricManager.let { manager ->
+                            val onUnlockMethod = manager::class.java.getMethod("onUnlock")
+                            onUnlockMethod.invoke(manager)
+                            Timber.tag("BIO_AUTH").d("Salesforce Biometric Manager unlocked successfully")
+                        }
+                    } catch (e: Exception) {
+                        Timber.tag("BIO_AUTH").e(e, "Failed to call onUnlock via reflection")
+                    }
+                },
+                onError = { errorCode, _ ->
+                    if (errorCode == androidx.biometric.BiometricPrompt.ERROR_USER_CANCELED ||
+                        errorCode == androidx.biometric.BiometricPrompt.ERROR_NEGATIVE_BUTTON) {
+                        onLockStateChange(false) 
+                    }
+                },
+                onFailed = { }
+            )
+        } else if (!isOptedIn && !alreadyPrompted && !authViewModel.biometricPromptSkippedThisSession) {
+            showEnrollmentSheet = true
         }
     }
 
-    if (showBiometricPrompt) {
-        PremiumBiometricDialog(
+    if (showEnrollmentSheet) {
+        BiometricEnrollmentBottomSheet(
+            status = biometricStatus,
             onEnable = {
-                biometricManager?.biometricOptIn(true)
-                prefs.edit { putBoolean("biometric_prompt_shown", true) }
-                showBiometricPrompt = false
+                if (biometricStatus == BiometricStatus.SUCCESS) {
+                    sfBiometricManager?.biometricOptIn(true)
+                    prefs.edit { putBoolean("biometric_enrollment_prompted", true) }
+                    showEnrollmentSheet = false
+                } else {
+                    biometricHelper.openBiometricSettings()
+                }
             },
             onSkip = {
-                biometricManager?.biometricOptIn(false)
-                prefs.edit { putBoolean("biometric_prompt_shown", true) }
-                showBiometricPrompt = false
+                authViewModel.setBiometricPromptSkipped()
+                sfBiometricManager?.biometricOptIn(false)
+                prefs.edit { putBoolean("biometric_enrollment_prompted", true) }
+                showEnrollmentSheet = false
+            },
+            onDismiss = {
+                showEnrollmentSheet = false
             }
         )
     }
-}
-
-@Composable
-fun PremiumBiometricDialog(
-    onEnable: () -> Unit,
-    onSkip: () -> Unit
-) {
-    AlertDialog(
-        onDismissRequest = {},
-        confirmButton = {},
-        dismissButton = {},
-        text = {
-            Card(
-                shape = RoundedCornerShape(20.dp),
-                elevation = CardDefaults.cardElevation(6.dp)
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(20.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-
-                    Text(text = "SalesforcePOC", fontSize = 25.sp)
-
-                    Text(
-                        text = "Enable Biometric Login",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.SemiBold
-                    )
-
-                    Text(
-                        text = "Secure your app with fingerprint or face unlock.",
-                        modifier = Modifier.padding(top = 8.dp),
-                        color = Color.Gray
-                    )
-
-                    Column(modifier = Modifier.padding(top = 16.dp)) {
-
-                        TextButton(onClick = onEnable, modifier = Modifier.fillMaxWidth()) {
-                            Text("Enable", fontWeight = FontWeight.Bold)
-                        }
-
-                        TextButton(onClick = onSkip, modifier = Modifier.fillMaxWidth()) {
-                            Text("Not Now")
-                        }
-                    }
-                }
-            }
-        }
-    )
 }

@@ -37,6 +37,13 @@ class AuthViewModel @Inject constructor(
 			initialValue = null,
 		)
 
+	var biometricPromptSkippedThisSession = false
+		private set
+
+	fun setBiometricPromptSkipped() {
+		biometricPromptSkippedThisSession = true
+	}
+
 	fun logout() {
 		viewModelScope.launch {
 			try {

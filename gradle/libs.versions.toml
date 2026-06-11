@@ -33,6 +33,7 @@ androidMaterial = "1.13.0"
 work = "2.10.0"
 hiltWork = "1.2.0"
 lifecycleRuntimeCompose = "2.8.6"
+biometric = "1.1.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -77,6 +78,7 @@ lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-view
 core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtxVersion" }
 
 timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
+androidx-biometric = { group = "androidx.biometric", name = "biometric", version.ref = "biometric" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
