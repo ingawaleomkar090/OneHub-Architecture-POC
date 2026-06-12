@@ -16,4 +16,19 @@
 
     <!-- Add other strings with groups as per usage or module with comment -->
     <string name="title_activity_Welcome">WelcomeActivity</string>
+
+    <!-- Onboarding Page 1 -->
+    <string name="onboarding_title_1">Welcome to OneHub!</string>
+    <string name="onboarding_desc_1">Manage your biologics and shipments all in one place. Your centralized platform for global logistics.</string>
+    <string name="onboarding_button_1">Next</string>
+
+    <!-- Onboarding Page 2 -->
+    <string name="onboarding_title_2">Track with precision</string>
+    <string name="onboarding_desc_2">Filter shipments by site, customer, and protocol. Favorite your most important hubs for quick access.</string>
+    <string name="onboarding_button_2">Next</string>
+
+    <!-- Onboarding Page 3 -->
+    <string name="onboarding_title_3">Stay updated</string>
+    <string name="onboarding_desc_3">Turn on notifications to get real-time alerts on shipment statuses, delays, and critical updates.</string>
+    <string name="onboarding_button_3">Allow Notifications</string>
 </resources>

@@ -1,5 +1,9 @@
 package com.catalent.onehub.presentation.screen
 
+import android.Manifest
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -25,6 +29,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -34,26 +39,31 @@ import com.catalent.onehub.presentation.data.WelcomePage
 
 @Composable
 fun WelcomeScreen(onFinish: () -> Unit) {
+	val notificationPermissionLauncher = rememberLauncherForActivityResult(
+		contract = ActivityResultContracts.RequestPermission()
+	) { _ ->
+		onFinish() // allow or deny both go to home
+	}
 	val pages = listOf(
 		WelcomePage(
 			imageRes = R.drawable.container,
-			title = "Welcome to OneHub!",
-			description = "Manage your biologics and shipments all in one place. Your centralized platform for global logistics.",
-			buttonText = "Next",
+			title = stringResource(R.string.onboarding_title_1),
+			description = stringResource(R.string.onboarding_desc_1),
+			buttonText = stringResource(R.string.onboarding_button_1),
 			showSkip = true,
 		),
 		WelcomePage(
 			imageRes = R.drawable.container_2,
-			title = "Track with precision",
-			description = "Filter shipments by site, customer, and protocol. Favorite your most important hubs for quick access.",
-			buttonText = "Next",
+			title = stringResource(R.string.onboarding_title_2),
+			description = stringResource(R.string.onboarding_desc_2),
+			buttonText = stringResource(R.string.onboarding_button_2),
 			showSkip = true,
 		),
 		WelcomePage(
 			imageRes = R.drawable.container_3,
-			title = "Stay updated",
-			description = "Turn on notifications to get real-time alerts on shipment statuses, delays, and critical updates.",
-			buttonText = "Allow Notifications",
+			title = stringResource(R.string.onboarding_title_3),
+			description = stringResource(R.string.onboarding_desc_3),
+			buttonText = stringResource(R.string.onboarding_button_3),
 			showSkip = false,
 		),
 	)
@@ -95,28 +105,38 @@ fun WelcomeScreen(onFinish: () -> Unit) {
 		)
 
 		Spacer(modifier = Modifier.weight(1f))
-////		 dot indicators
-//		Row(
-//			horizontalArrangement = Arrangement.Center,
-//			modifier = Modifier.fillMaxWidth(),
-//		) {
-//			pages.forEachIndexed { index, _ ->
-//				Box(
-//					modifier = Modifier
-//						.padding(horizontal = 4.dp)
-//						.size(if (index == currentPage) 10.dp else 8.dp)
-//						.background(
-//							color = if (index == currentPage) Color(0xFF1B2A4A) else Color.LightGray,
-//							shape = RoundedCornerShape(50),
-//						)
-//				)
-//			}
-//		}
-//		Spacer(modifier = Modifier.height(24.dp))
+		// dot indicators
+		Row(
+			horizontalArrangement = Arrangement.Center,
+			modifier = Modifier.fillMaxWidth(),
+		) {
+			pages.forEachIndexed { index, _ ->
+				Box(
+					modifier = Modifier
+						.padding(horizontal = 4.dp)
+						.size(if (index == currentPage) 10.dp else 8.dp)
+						.background(
+							color = if (index == currentPage) Color(0xFF1B2A4A) else Color.LightGray,
+							shape = RoundedCornerShape(50),
+						)
+				)
+			}
+		}
+
+		Spacer(modifier = Modifier.height(24.dp))
+
 		Button(
 			onClick = {
-				if (currentPage < pages.size - 1) currentPage++
-				else onFinish()
+				if (currentPage < pages.size - 1) {
+					currentPage++
+				} else {
+					// last page — trigger system notification permission popup
+					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+						notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+					} else {
+						onFinish()
+					}
+				}
 			},
 			modifier = Modifier
 				.fillMaxWidth()
@@ -132,17 +152,18 @@ fun WelcomeScreen(onFinish: () -> Unit) {
 			)
 		}
 
-		Spacer(modifier = Modifier.height(40.dp))
-//		if (pages[currentPage].showSkip) {
-//			TextButton(onClick = onFinish) {
-//				Text(text = "Skip", color = Color.Gray, fontSize = 15.sp)
-//			}
-//		} else {
-//			TextButton(onClick = onFinish) {
-//				Text(text = "Not Now", color = Color.Gray, fontSize = 15.sp)
-//			}
-//		}
+		Spacer(modifier = Modifier.height(16.dp))
+		// show Skip on first two pages, Not Now on last page
+		if (pages[currentPage].showSkip) {
+			TextButton(onClick = onFinish) {
+				Text(text = "Skip", color = Color.Gray, fontSize = 15.sp)
+			}
+		} else {
+			TextButton(onClick = onFinish) {
+				Text(text = "Not Now", color = Color.Gray, fontSize = 15.sp)
+			}
+		}
 
-//		Spacer(modifier = Modifier.height(24.dp))
+		Spacer(modifier = Modifier.height(24.dp))
 	}
 }

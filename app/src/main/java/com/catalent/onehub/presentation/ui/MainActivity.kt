@@ -1,5 +1,6 @@
 package com.catalent.onehub.presentation.ui
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -11,10 +12,16 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.catalent.onehub.R
 import com.catalent.auth.domain.AuthState
@@ -25,6 +32,7 @@ import com.catalent.core.network.NetworkManager
 import com.catalent.onehub.presentation.error.toStringRes
 import com.catalent.onehub.presentation.screen.ErrorScreen
 import com.catalent.onehub.presentation.screen.HomeScreen
+import com.catalent.onehub.presentation.screen.WelcomeScreen
 import com.catalent.onehub.ui.theme.CatalentOneHubTheme
 import com.salesforce.androidsdk.rest.RestClient
 import com.salesforce.androidsdk.ui.SalesforceActivity
@@ -40,25 +48,21 @@ class MainActivity : SalesforceActivity() {
     private val authViewModel: AuthViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        installSplashScreen() // ← system splash shows here
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-
         setContent {
-            CatalentOneHubContent(
-                clientProvider = clientProvider,
-                networkManager = networkManager,
-                authViewModel = authViewModel
-            )
+            CatalentOneHubTheme {
+                CatalentOneHubContent(
+                    clientProvider = clientProvider,
+                    networkManager = networkManager,
+                    authViewModel = authViewModel,
+                )
+            }
         }
     }
 
-    /**
-     * SalesforceActivity provides the RestClient here.
-     * We use LifecycleResumeEffect to manage the ClientProvider lifecycle
-     * within the Compose composition, following modern best practices.
-     */
     override fun onResume(client: RestClient) {
-        // We still need this to capture the client from Salesforce SDK
         clientProvider.onClientAvailable(RawClientWrapper(client))
     }
 
@@ -68,46 +72,107 @@ class MainActivity : SalesforceActivity() {
     }
 }
 
+//@Composable
+//fun CatalentOneHubContent(
+//    clientProvider: ClientProvider,
+//    networkManager: NetworkManager,
+//    authViewModel: AuthViewModel
+//) {
+//    val authState by authViewModel.authState.collectAsStateWithLifecycle(AuthState.Unauthenticated)
+//    val errorState by authViewModel.errorState.collectAsStateWithLifecycle(null)
+//    val isConnected by networkManager.observeConnectivity.collectAsStateWithLifecycle(initialValue = true)
+//
+//    CatalentOneHubTheme {
+//        errorState?.let { error ->
+//            AlertDialog(
+//                onDismissRequest = { authViewModel.clearError() },
+//                title = { Text(stringResource(R.string.title_error)) },
+//                text = { Text(stringResource(error.toStringRes())) },
+//                confirmButton = {
+//                    TextButton(onClick = { authViewModel.clearError() }) {
+//                        Text("OK")
+//                    }
+//                }
+//            )
+//        }
+//
+//        when (val state = authState) {
+//            is AuthState.Authenticated -> HomeScreen(
+//                isConnected = isConnected,
+//                onLogout = { authViewModel.logout() }
+//            )
+//
+//            is AuthState.Error -> ErrorScreen(
+//                message = stringResource(state.exception.toStringRes()),
+//                onRetry = { authViewModel.logout() }
+//            )
+//
+//            is AuthState.Unauthenticated,
+//            is AuthState.Loading -> {
+//                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+//                    CircularProgressIndicator()
+//                }
+//            }
+//        }
+//    }
+//}
+
 @Composable
 fun CatalentOneHubContent(
     clientProvider: ClientProvider,
     networkManager: NetworkManager,
-    authViewModel: AuthViewModel
+    authViewModel: AuthViewModel,
 ) {
+    val context = LocalContext.current
     val authState by authViewModel.authState.collectAsStateWithLifecycle(AuthState.Unauthenticated)
     val errorState by authViewModel.errorState.collectAsStateWithLifecycle(null)
     val isConnected by networkManager.observeConnectivity.collectAsStateWithLifecycle(initialValue = true)
 
-    CatalentOneHubTheme {
-        errorState?.let { error ->
-            AlertDialog(
-                onDismissRequest = { authViewModel.clearError() },
-                title = { Text(stringResource(R.string.title_error)) },
-                text = { Text(stringResource(error.toStringRes())) },
-                confirmButton = {
-                    TextButton(onClick = { authViewModel.clearError() }) {
-                        Text("OK")
-                    }
+    val prefs = remember { context.getSharedPreferences("prefs", Context.MODE_PRIVATE) }
+    var showOnboarding by remember { mutableStateOf(false) }
+
+    errorState?.let { error ->
+        AlertDialog(
+            onDismissRequest = { authViewModel.clearError() },
+            title = { Text(stringResource(R.string.title_error)) },
+            text = { Text(stringResource(error.toStringRes())) },
+            confirmButton = {
+                TextButton(onClick = { authViewModel.clearError() }) {
+                    Text("OK")
                 }
-            )
+            }
+        )
+    }
+
+    when (val state = authState) {
+        is AuthState.Authenticated -> {
+            LaunchedEffect(Unit) {
+                showOnboarding = !prefs.getBoolean("onboarding_done", false)
+            }
+            if (showOnboarding) {
+                WelcomeScreen(
+                    onFinish = {
+                        prefs.edit().putBoolean("onboarding_done", true).apply()
+                        showOnboarding = false
+                    }
+                )
+            } else {
+                HomeScreen(
+                    isConnected = isConnected,
+                    onLogout = { authViewModel.logout() }
+                )
+            }
         }
 
-        when (val state = authState) {
-            is AuthState.Authenticated -> HomeScreen(
-                isConnected = isConnected,
-                onLogout = { authViewModel.logout() }
-            )
+        is AuthState.Error -> ErrorScreen(
+            message = stringResource(state.exception.toStringRes()),
+            onRetry = { authViewModel.logout() }
+        )
 
-            is AuthState.Error -> ErrorScreen(
-                message = stringResource(state.exception.toStringRes()),
-                onRetry = { authViewModel.logout() }
-            )
-
-            is AuthState.Unauthenticated,
-            is AuthState.Loading -> {
-                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator()
-                }
+        is AuthState.Unauthenticated,
+        is AuthState.Loading -> {
+            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator()
             }
         }
     }
