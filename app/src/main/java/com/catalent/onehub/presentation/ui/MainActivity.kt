@@ -16,6 +16,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,6 +39,7 @@ import com.salesforce.androidsdk.rest.RestClient
 import com.salesforce.androidsdk.ui.SalesforceActivity
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+import androidx.core.content.edit
 
 @AndroidEntryPoint
 class MainActivity : SalesforceActivity() {
@@ -72,51 +74,6 @@ class MainActivity : SalesforceActivity() {
     }
 }
 
-//@Composable
-//fun CatalentOneHubContent(
-//    clientProvider: ClientProvider,
-//    networkManager: NetworkManager,
-//    authViewModel: AuthViewModel
-//) {
-//    val authState by authViewModel.authState.collectAsStateWithLifecycle(AuthState.Unauthenticated)
-//    val errorState by authViewModel.errorState.collectAsStateWithLifecycle(null)
-//    val isConnected by networkManager.observeConnectivity.collectAsStateWithLifecycle(initialValue = true)
-//
-//    CatalentOneHubTheme {
-//        errorState?.let { error ->
-//            AlertDialog(
-//                onDismissRequest = { authViewModel.clearError() },
-//                title = { Text(stringResource(R.string.title_error)) },
-//                text = { Text(stringResource(error.toStringRes())) },
-//                confirmButton = {
-//                    TextButton(onClick = { authViewModel.clearError() }) {
-//                        Text("OK")
-//                    }
-//                }
-//            )
-//        }
-//
-//        when (val state = authState) {
-//            is AuthState.Authenticated -> HomeScreen(
-//                isConnected = isConnected,
-//                onLogout = { authViewModel.logout() }
-//            )
-//
-//            is AuthState.Error -> ErrorScreen(
-//                message = stringResource(state.exception.toStringRes()),
-//                onRetry = { authViewModel.logout() }
-//            )
-//
-//            is AuthState.Unauthenticated,
-//            is AuthState.Loading -> {
-//                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-//                    CircularProgressIndicator()
-//                }
-//            }
-//        }
-//    }
-//}
-
 @Composable
 fun CatalentOneHubContent(
     clientProvider: ClientProvider,
@@ -129,7 +86,7 @@ fun CatalentOneHubContent(
     val isConnected by networkManager.observeConnectivity.collectAsStateWithLifecycle(initialValue = true)
 
     val prefs = remember { context.getSharedPreferences("prefs", Context.MODE_PRIVATE) }
-    var showOnboarding by remember { mutableStateOf(false) }
+    var showOnboarding by rememberSaveable { mutableStateOf(false) }
 
     errorState?.let { error ->
         AlertDialog(
@@ -152,7 +109,7 @@ fun CatalentOneHubContent(
             if (showOnboarding) {
                 WelcomeScreen(
                     onFinish = {
-                        prefs.edit().putBoolean("onboarding_done", true).apply()
+                        prefs.edit { putBoolean("onboarding_done", true) }
                         showOnboarding = false
                     }
                 )
@@ -168,12 +125,12 @@ fun CatalentOneHubContent(
             message = stringResource(state.exception.toStringRes()),
             onRetry = { authViewModel.logout() }
         )
-
-        is AuthState.Unauthenticated,
-        is AuthState.Loading -> {
-            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator()
-            }
-        }
+	    is AuthState.Unauthenticated,
+	    is AuthState.Loading,
+		    -> {
+		    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+			    CircularProgressIndicator()
+		    }
+	    }
     }
 }

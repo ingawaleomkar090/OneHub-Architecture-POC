@@ -24,6 +24,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,10 +33,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.catalent.onehub.R
 import com.catalent.onehub.presentation.data.WelcomePage
+import com.catalent.onehub.ui.theme.CatalentOneHubTheme
 
 @Composable
 fun WelcomeScreen(onFinish: () -> Unit) {
@@ -44,30 +47,43 @@ fun WelcomeScreen(onFinish: () -> Unit) {
 	) { _ ->
 		onFinish() // allow or deny both go to home
 	}
+	// resolve strings here — works in both preview and runtime
+	val title1 = stringResource(R.string.onboarding_title_1)
+	val desc1 = stringResource(R.string.onboarding_desc_1)
+	val button1 = stringResource(R.string.onboarding_button_1)
+
+	val title2 = stringResource(R.string.onboarding_title_2)
+	val desc2 = stringResource(R.string.onboarding_desc_2)
+	val button2 = stringResource(R.string.onboarding_button_2)
+
+	val title3 = stringResource(R.string.onboarding_title_3)
+	val desc3 = stringResource(R.string.onboarding_desc_3)
+	val button3 = stringResource(R.string.onboarding_button_3)
+
 	val pages = listOf(
 		WelcomePage(
 			imageRes = R.drawable.container,
-			title = stringResource(R.string.onboarding_title_1),
-			description = stringResource(R.string.onboarding_desc_1),
-			buttonText = stringResource(R.string.onboarding_button_1),
+			title = title1,
+			description = desc1,
+			buttonText = button1,
 			showSkip = true,
 		),
 		WelcomePage(
 			imageRes = R.drawable.container_2,
-			title = stringResource(R.string.onboarding_title_2),
-			description = stringResource(R.string.onboarding_desc_2),
-			buttonText = stringResource(R.string.onboarding_button_2),
+			title = title2,
+			description = desc2,
+			buttonText = button2,
 			showSkip = true,
 		),
 		WelcomePage(
 			imageRes = R.drawable.container_3,
-			title = stringResource(R.string.onboarding_title_3),
-			description = stringResource(R.string.onboarding_desc_3),
-			buttonText = stringResource(R.string.onboarding_button_3),
+			title = title3,
+			description = desc3,
+			buttonText = button3,
 			showSkip = false,
 		),
 	)
-	var currentPage by remember { mutableIntStateOf(0) }
+	var currentPage by rememberSaveable { mutableIntStateOf(0) }
 
 	Column(
 		modifier = Modifier
@@ -105,36 +121,18 @@ fun WelcomeScreen(onFinish: () -> Unit) {
 		)
 
 		Spacer(modifier = Modifier.weight(1f))
-		// dot indicators
-		Row(
-			horizontalArrangement = Arrangement.Center,
-			modifier = Modifier.fillMaxWidth(),
-		) {
-			pages.forEachIndexed { index, _ ->
-				Box(
-					modifier = Modifier
-						.padding(horizontal = 4.dp)
-						.size(if (index == currentPage) 10.dp else 8.dp)
-						.background(
-							color = if (index == currentPage) Color(0xFF1B2A4A) else Color.LightGray,
-							shape = RoundedCornerShape(50),
-						)
-				)
-			}
-		}
-
-		Spacer(modifier = Modifier.height(24.dp))
 
 		Button(
 			onClick = {
 				if (currentPage < pages.size - 1) {
 					currentPage++
 				} else {
-					// last page — trigger system notification permission popup
+					onFinish() // save onboarding_done first
+
 					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-						notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-					} else {
-						onFinish()
+						notificationPermissionLauncher.launch(
+							Manifest.permission.POST_NOTIFICATIONS
+						)
 					}
 				}
 			},
@@ -151,19 +149,15 @@ fun WelcomeScreen(onFinish: () -> Unit) {
 				color = Color.White,
 			)
 		}
+//
+		Spacer(modifier = Modifier.height(100.dp))
+	}
+}
 
-		Spacer(modifier = Modifier.height(16.dp))
-		// show Skip on first two pages, Not Now on last page
-		if (pages[currentPage].showSkip) {
-			TextButton(onClick = onFinish) {
-				Text(text = "Skip", color = Color.Gray, fontSize = 15.sp)
-			}
-		} else {
-			TextButton(onClick = onFinish) {
-				Text(text = "Not Now", color = Color.Gray, fontSize = 15.sp)
-			}
-		}
-
-		Spacer(modifier = Modifier.height(24.dp))
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun WelcomeScreenPreview() {
+	CatalentOneHubTheme {
+		WelcomeScreen(onFinish = {})
 	}
 }
