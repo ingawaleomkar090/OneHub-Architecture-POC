@@ -5,5 +5,9 @@
 
     <!-- Value from product flavor: dev -->
     <string name="app_name" translatable="false">OneHub Dev</string>
+    <!-- Value from default config. -->
+    <string name="oauthRedirectURI" translatable="false">fieldagentapp://mobile/oauth/onehub</string>
+    <!-- Value from default config. -->
+    <string name="remoteAccessConsumerKey" translatable="false">3MVG9WCdh6PFin0hoY9Attgl85YFvsToXWXRiFjaQ19Men_slb.SxeDTmJOxM0iaCiQOBdTR6y9cvye2BPkb6</string>
 
 </resources>

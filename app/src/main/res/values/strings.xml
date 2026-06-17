@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">CatalentOneHub</string>
     <string name="welcome">Welcome %s</string>
     <string name="logout_button">Logout</string>
@@ -13,6 +13,9 @@
     <string name="error_session_expired">Session expired. Please sign in again.</string>
     <string name="error_network">You\'re offline. Showing cached data.</string>
     <string name="error_logout_failed">Logout failed. Please try again.</string>
+
+    <!-- Salesforce -->
+    <string name="account_type" tools:replace="android:value">com.catalent.onehub.dev.debug.login</string>
 
     <!-- Add other strings with groups as per usage or module with comment -->
 </resources>

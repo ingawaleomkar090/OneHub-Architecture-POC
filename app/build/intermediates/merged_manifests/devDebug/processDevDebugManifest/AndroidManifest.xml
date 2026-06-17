@@ -53,6 +53,19 @@
             </intent-filter>
         </activity>
 
+        <service
+            android:name="com.salesforce.androidsdk.auth.AuthenticatorService"
+            android:exported="true"
+            android:permission="android.permission.BIND_REMOTELY_RENDERED_SERVICE" >
+            <intent-filter>
+                <action android:name="android.accounts.AccountAuthenticator" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.accounts.AccountAuthenticator"
+                android:resource="@xml/authenticator" />
+        </service>
+
         <!-- <activity android:name="com.salesforce.androidsdk.ui.LoginActivity" -->
         <!-- android:theme="@style/Theme.CatalentOneHubNoActionBar" -->
         <!-- android:launchMode="singleTask" -->
@@ -70,25 +83,39 @@
 
 
         <!-- Salesforce login — handles OAuth redirect -->
-        <activity
-            android:name="com.salesforce.androidsdk.ui.LoginActivity"
-            android:configChanges="orientation|screenLayout|uiMode|screenSize|smallestScreenSize"
-            android:exported="true"
-            android:launchMode="singleTask"
-            android:theme="@style/Theme.CatalentOneHubNoActionBar"
-            android:windowSoftInputMode="adjustResize" >
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
+        <!-- <activity -->
+        <!-- android:name="com.salesforce.androidsdk.ui.LoginActivity" -->
+        <!-- android:exported="true" -->
+        <!-- android:launchMode="singleTask" -->
+        <!-- android:theme="@style/Theme.CatalentOneHubNoActionBar" -->
+        <!-- tools:replace="android:theme"> -->
+        <!-- <intent-filter> -->
+        <!-- <action android:name="android.intent.action.VIEW" /> -->
+        <!-- <category android:name="android.intent.category.DEFAULT" /> -->
+        <!-- <category android:name="android.intent.category.BROWSABLE" /> -->
+        <!-- <data -->
+        <!-- android:scheme="fieldagentapp" -->
+        <!-- android:host="mobile" -->
+        <!-- android:path="/oauth/onehub" /> -->
+        <!-- </intent-filter> -->
+        <!-- </activity> -->
 
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
 
-                <data
-                    android:host="mobile"
-                    android:path="/oauth/onehub"
-                    android:scheme="fieldagentapp" />
-            </intent-filter>
-        </activity>
+        <!-- WorkManager — Disable default initializer for custom Hilt Configuration -->
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="com.catalent.onehub.dev.debug.androidx-startup"
+            android:exported="false" >
+            <meta-data
+                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+                android:value="androidx.startup" />
+            <meta-data
+                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+                android:value="androidx.startup" />
+            <meta-data
+                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
+                android:value="androidx.startup" />
+        </provider>
         <!-- SmartStore Inspector screen -->
         <activity
             android:name="com.salesforce.androidsdk.smartstore.ui.SmartStoreInspectorActivity"
@@ -100,18 +127,8 @@
             android:theme="@style/SalesforceSDK" /> <!-- Metadata for supported app restrictions -->
         <meta-data
             android:name="android.content.APP_RESTRICTIONS"
-            android:resource="@xml/app_restrictions" /> <!-- Service required for authentication -->
-        <service
-            android:name="com.salesforce.androidsdk.auth.AuthenticatorService"
-            android:exported="true" >
-            <intent-filter>
-                <action android:name="android.accounts.AccountAuthenticator" />
-            </intent-filter>
+            android:resource="@xml/app_restrictions" />
 
-            <meta-data
-                android:name="android.accounts.AccountAuthenticator"
-                android:resource="@xml/authenticator" />
-        </service>
         <service
             android:name="com.salesforce.androidsdk.auth.LegacyAuthenticatorService"
             android:exported="true" >
@@ -122,7 +139,14 @@
             <meta-data
                 android:name="android.accounts.AccountAuthenticator"
                 android:resource="@xml/legacy_authenticator" />
-        </service> <!-- Token Migration Activity -->
+        </service> <!-- Login activity -->
+        <activity
+            android:name="com.salesforce.androidsdk.ui.LoginActivity"
+            android:configChanges="orientation|screenLayout|uiMode|screenSize|smallestScreenSize"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:theme="@style/SalesforceSDK"
+            android:windowSoftInputMode="adjustResize" /> <!-- Token Migration Activity -->
         <activity
             android:name="com.salesforce.androidsdk.ui.TokenMigrationActivity"
             android:excludeFromRecents="true"
@@ -236,24 +260,6 @@
         <activity
             android:name="androidx.compose.ui.tooling.PreviewActivity"
             android:exported="true" />
-
-        <provider
-            android:name="androidx.startup.InitializationProvider"
-            android:authorities="com.catalent.onehub.dev.debug.androidx-startup"
-            android:exported="false" >
-            <meta-data
-                android:name="androidx.emoji2.text.EmojiCompatInitializer"
-                android:value="androidx.startup" />
-            <meta-data
-                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
-                android:value="androidx.startup" />
-            <meta-data
-                android:name="androidx.work.WorkManagerInitializer"
-                android:value="androidx.startup" />
-            <meta-data
-                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
-                android:value="androidx.startup" />
-        </provider>
 
         <service
             android:name="androidx.work.impl.background.systemalarm.SystemAlarmService"

@@ -237,6 +237,7 @@ The Gradle build script is configured to check for these **Environment Variables
 
 1. `SALESFORCE_CONSUMER_KEY`
 2. `SALESFORCE_REDIRECT_URI`
+3. `SALESFORCE_REDIRECT_AUTHURI`
 
 ### Setting up a Pipeline
 1. Go to your CI/CD platform's **Secrets** or **Variable Groups** section.

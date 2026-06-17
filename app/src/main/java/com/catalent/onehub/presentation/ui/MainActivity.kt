@@ -1,6 +1,8 @@
 package com.catalent.onehub.presentation.ui
 
 import android.os.Bundle
+import android.util.Log
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
@@ -15,25 +17,31 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.lifecycle.compose.LifecycleResumeEffect
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.catalent.onehub.R
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.catalent.auth.domain.AuthState
 import com.catalent.auth.ui.AuthViewModel
+import com.catalent.auth.ui.ForgotPasswordViewModel
+import com.catalent.auth.ui.LoginViewModel
+import com.catalent.auth.ui.screen.ForgotPasswordScreen
+import com.catalent.auth.ui.screen.LoginScreen
 import com.catalent.core.network.ClientProvider
-import com.catalent.core.network.RawClientWrapper
 import com.catalent.core.network.NetworkManager
+import com.catalent.core.network.RawClientWrapper
+import com.catalent.onehub.R
 import com.catalent.onehub.presentation.error.toStringRes
 import com.catalent.onehub.presentation.screen.ErrorScreen
 import com.catalent.onehub.presentation.screen.HomeScreen
 import com.catalent.onehub.ui.theme.CatalentOneHubTheme
-import com.salesforce.androidsdk.rest.RestClient
-import com.salesforce.androidsdk.ui.SalesforceActivity
+import com.salesforce.androidsdk.app.SalesforceSDKManager
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class MainActivity : SalesforceActivity() {
+class MainActivity : ComponentActivity() {
 
     @Inject lateinit var clientProvider: ClientProvider
     @Inject lateinit var networkManager: NetworkManager
@@ -44,6 +52,9 @@ class MainActivity : SalesforceActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
+        // Check for existing session immediately
+        checkAndInitializeClient()
+
         setContent {
             CatalentOneHubContent(
                 clientProvider = clientProvider,
@@ -53,19 +64,29 @@ class MainActivity : SalesforceActivity() {
         }
     }
 
-    /**
-     * SalesforceActivity provides the RestClient here.
-     * We use LifecycleResumeEffect to manage the ClientProvider lifecycle
-     * within the Compose composition, following modern best practices.
-     */
-    override fun onResume(client: RestClient) {
-        // We still need this to capture the client from Salesforce SDK
-        clientProvider.onClientAvailable(RawClientWrapper(client))
+    override fun onResume() {
+        super.onResume()
+        // Re-check in case account was added/removed while activity was paused
+        checkAndInitializeClient()
     }
 
-    override fun onPause() {
-        super.onPause()
-        clientProvider.onClientRemoved()
+    private fun checkAndInitializeClient() {
+        Log.d("MainActivity", "checkAndInitializeClient: Starting")
+        val sdkManager = SalesforceSDKManager.getInstance()
+        val account = sdkManager.userAccountManager.currentUser
+
+        if (account != null) {
+            Log.d("MainActivity", "checkAndInitializeClient: Existing account found: ${account.username}")
+            val client = sdkManager.clientManager.peekRestClient()
+            if (client != null) {
+                Log.d("MainActivity", "checkAndInitializeClient: RestClient obtained, notifying ClientProvider")
+                clientProvider.onClientAvailable(RawClientWrapper(client))
+            } else {
+                Log.w("MainActivity", "checkAndInitializeClient: Account exists but peekRestClient() returned null")
+            }
+        } else {
+            Log.d("MainActivity", "checkAndInitializeClient: No account found")
+        }
     }
 }
 
@@ -75,18 +96,35 @@ fun CatalentOneHubContent(
     networkManager: NetworkManager,
     authViewModel: AuthViewModel
 ) {
-    val authState by authViewModel.authState.collectAsStateWithLifecycle(AuthState.Unauthenticated)
+    val authState by authViewModel.authState.collectAsStateWithLifecycle(AuthState.Loading)
     val errorState by authViewModel.errorState.collectAsStateWithLifecycle(null)
     val isConnected by networkManager.observeConnectivity.collectAsStateWithLifecycle(initialValue = true)
 
+    CatalentOneHubMainScreen(
+        authState = authState,
+        errorState = errorState,
+        isConnected = isConnected,
+        onClearError = { authViewModel.clearError() },
+        onLogout = { authViewModel.logout() }
+    )
+}
+
+@Composable
+fun CatalentOneHubMainScreen(
+    authState: AuthState,
+    errorState: com.catalent.auth.domain.exceptions.AuthException?,
+    isConnected: Boolean,
+    onClearError: () -> Unit,
+    onLogout: () -> Unit
+) {
     CatalentOneHubTheme {
         errorState?.let { error ->
             AlertDialog(
-                onDismissRequest = { authViewModel.clearError() },
+                onDismissRequest = onClearError,
                 title = { Text(stringResource(R.string.title_error)) },
                 text = { Text(stringResource(error.toStringRes())) },
                 confirmButton = {
-                    TextButton(onClick = { authViewModel.clearError() }) {
+                    TextButton(onClick = onClearError) {
                         Text("OK")
                     }
                 }
@@ -94,22 +132,57 @@ fun CatalentOneHubContent(
         }
 
         when (val state = authState) {
-            is AuthState.Authenticated -> HomeScreen(
-                isConnected = isConnected,
-                onLogout = { authViewModel.logout() }
-            )
+            is AuthState.Authenticated -> {
+                Log.d("MainActivity", "CatalentOneHubContent: AuthState.Authenticated -> Showing HomeScreen")
+                HomeScreen(
+                    isConnected = isConnected,
+                    onLogout = onLogout
+                )
+            }
 
-            is AuthState.Error -> ErrorScreen(
-                message = stringResource(state.exception.toStringRes()),
-                onRetry = { authViewModel.logout() }
-            )
+            is AuthState.Error -> {
+                Log.d("MainActivity", "CatalentOneHubContent: AuthState.Error -> Showing ErrorScreen")
+                ErrorScreen(
+                    message = stringResource(state.exception.toStringRes()),
+                    onRetry = onLogout
+                )
+            }
 
-            is AuthState.Unauthenticated,
             is AuthState.Loading -> {
-                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Log.d("MainActivity", "CatalentOneHubContent: AuthState.Loading -> Showing ProgressIndicator")
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator()
                 }
             }
+
+            is AuthState.Unauthenticated -> {
+                Log.d("MainActivity", "CatalentOneHubContent: AuthState.Unauthenticated -> Showing AuthNavigation")
+                AuthNavigation()
+            }
+        }
+    }
+}
+
+@Composable
+fun AuthNavigation() {
+    val navController = rememberNavController()
+    NavHost(navController = navController, startDestination = "login") {
+        composable("login") {
+            val loginViewModel: LoginViewModel = hiltViewModel()
+            LoginScreen(
+                viewModel = loginViewModel,
+                onNavigateToForgot = { navController.navigate("forgot_password") }
+            )
+        }
+        composable("forgot_password") {
+            val forgotViewModel: ForgotPasswordViewModel = hiltViewModel()
+            ForgotPasswordScreen(
+                viewModel = forgotViewModel,
+                onBackToLogin = { 
+                    forgotViewModel.clear()
+                    navController.popBackStack() 
+                }
+            )
         }
     }
 }

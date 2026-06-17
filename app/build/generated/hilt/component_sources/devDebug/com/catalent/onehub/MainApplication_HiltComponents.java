@@ -1,8 +1,13 @@
 package com.catalent.onehub;
 
+import androidx.hilt.work.HiltWrapper_WorkerFactoryModule;
 import com.catalent.auth.data.di.AuthDataModule;
 import com.catalent.auth.ui.AuthViewModel_HiltModules;
+import com.catalent.auth.ui.ForgotPasswordViewModel_HiltModules;
+import com.catalent.auth.ui.LoginViewModel_HiltModules;
 import com.catalent.onehub.presentation.ui.MainActivity_GeneratedInjector;
+import com.catalent.onehub.presentation.viewmodel.HomeViewModel_HiltModules;
+import com.catalent.onehub.sync.SyncWorker_HiltModule;
 import com.catalent.shipment.data.di.ShipmentDataModule;
 import com.catalent.shipment.ui.presentation.viewmodel.SObjectListViewModel_HiltModules;
 import dagger.Binds;
@@ -132,9 +137,11 @@ public final class MainApplication_HiltComponents {
           ApplicationContextModule.class,
           AuthDataModule.class,
           HiltWrapper_FragmentGetContextFix_FragmentGetContextFixModule.class,
+          HiltWrapper_WorkerFactoryModule.class,
           ActivityRetainedCBuilderModule.class,
           ServiceCBuilderModule.class,
-          ShipmentDataModule.class
+          ShipmentDataModule.class,
+          SyncWorker_HiltModule.class
       }
   )
   @Singleton
@@ -158,8 +165,11 @@ public final class MainApplication_HiltComponents {
   @Subcomponent(
       modules = {
           AuthViewModel_HiltModules.KeyModule.class,
+          ForgotPasswordViewModel_HiltModules.KeyModule.class,
           HiltWrapper_ActivityRetainedComponentManager_LifecycleModule.class,
           HiltWrapper_SavedStateHandleModule.class,
+          HomeViewModel_HiltModules.KeyModule.class,
+          LoginViewModel_HiltModules.KeyModule.class,
           ActivityCBuilderModule.class,
           ViewModelCBuilderModule.class,
           SObjectListViewModel_HiltModules.KeyModule.class
@@ -199,7 +209,10 @@ public final class MainApplication_HiltComponents {
   @Subcomponent(
       modules = {
           AuthViewModel_HiltModules.BindsModule.class,
+          ForgotPasswordViewModel_HiltModules.BindsModule.class,
           HiltWrapper_HiltViewModelFactory_ViewModelModule.class,
+          HomeViewModel_HiltModules.BindsModule.class,
+          LoginViewModel_HiltModules.BindsModule.class,
           SObjectListViewModel_HiltModules.BindsModule.class
       }
   )

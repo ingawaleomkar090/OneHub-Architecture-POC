@@ -27,7 +27,7 @@ class AuthViewModel @Inject constructor(
 		.stateIn(
 			scope = viewModelScope,
 			started = SharingStarted.WhileSubscribed(5_000),
-			initialValue = AuthState.Unauthenticated,
+			initialValue = AuthState.Loading,
 		)
 
 	val errorState: StateFlow<AuthException?> = _errorState
@@ -41,12 +41,12 @@ class AuthViewModel @Inject constructor(
 		viewModelScope.launch {
 			try {
 				logoutUseCase()
-			} catch (e: AuthException) {
-				e("logout", "AuthException — ${e.message}", e)
-				_errorState.value = e
-			} catch (e: Throwable) {
-				e("logout", "unexpected error — ${e.message}", e)
-				_errorState.value = AuthException.UnknownError(e.message ?: "Unknown error")
+			} catch (authException: AuthException) {
+				e("logout", "AuthException — ${authException.message}", authException)
+				_errorState.value = authException
+			} catch (throwable: Throwable) {
+				e("logout", "unexpected error — ${throwable.message}", throwable)
+				_errorState.value = AuthException.UnknownError(throwable.message ?: "Unknown error")
 			}
 		}
 	}

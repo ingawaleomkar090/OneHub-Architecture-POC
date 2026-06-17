@@ -13,27 +13,35 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
+import androidx.compose.ui.tooling.preview.Preview
+
 @Composable
 fun SearchBar(
-	query: String,
-	onQueryChange: (String) -> Unit,
-	modifier: Modifier = Modifier,
+    query: String,
+    onQueryChange: (String) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-	OutlinedTextField(
-		value = query,
-		onValueChange = onQueryChange,
-		modifier = modifier
-			.fillMaxWidth()
-			.padding(8.dp),
-		placeholder = { Text("Search records...") },
-		leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
-		trailingIcon = {
-			if (query.isNotEmpty()) {
-				IconButton(onClick = { onQueryChange("") }) {
-					Icon(Icons.Default.Close, contentDescription = null)
-				}
-			}
-		},
-		singleLine = true,
-	)
+    OutlinedTextField(
+        value = query,
+        onValueChange = onQueryChange,
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+        placeholder = { Text("Search records...") },
+        leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+        trailingIcon = {
+            if (query.isNotEmpty()) {
+                IconButton(onClick = { onQueryChange("") }) {
+                    Icon(Icons.Default.Close, contentDescription = null)
+                }
+            }
+        },
+        singleLine = true,
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+fun SearchBarPreview() {
+    SearchBar(query = "Preview Search", onQueryChange = {})
 }

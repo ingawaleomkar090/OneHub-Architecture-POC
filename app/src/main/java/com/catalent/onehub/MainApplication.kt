@@ -9,7 +9,6 @@ import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.catalent.onehub.presentation.ui.MainActivity
-import com.catalent.auth.ui.HiddenLoginViewModel
 import com.catalent.core.logging.AppLogger
 import com.catalent.onehub.sync.SyncWorker
 import com.salesforce.androidsdk.mobilesync.app.MobileSyncSDKManager
@@ -40,9 +39,11 @@ class MainApplication : Application(), Configuration.Provider {
     }
 
     private fun initSalesforceSDK() {
+        // We initialize with MainActivity as the pass-through activity.
+        // The SDK won't auto-launch login if we don't extend SalesforceActivity,
+        // but it needs a main activity class reference for its internal routing.
         MobileSyncSDKManager.initNative(applicationContext, MainActivity::class.java, null)
         MobileSyncSDKManager.getInstance().registerUsedAppFeature(FEATURE_APP_USES_KOTLIN)
-        MobileSyncSDKManager.getInstance().loginViewModelFactory = HiddenLoginViewModel.Factory
     }
 
     private fun schedulePeriodicSync() {

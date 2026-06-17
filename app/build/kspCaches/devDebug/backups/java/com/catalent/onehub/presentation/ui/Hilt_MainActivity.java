@@ -2,10 +2,10 @@ package com.catalent.onehub.presentation.ui;
 
 import android.content.Context;
 import android.os.Bundle;
+import androidx.activity.ComponentActivity;
 import androidx.activity.contextaware.OnContextAvailableListener;
 import androidx.annotation.CallSuper;
 import androidx.lifecycle.ViewModelProvider;
-import com.salesforce.androidsdk.ui.SalesforceActivity;
 import dagger.hilt.android.internal.lifecycle.DefaultViewModelFactories;
 import dagger.hilt.android.internal.managers.ActivityComponentManager;
 import dagger.hilt.android.internal.managers.SavedStateHandleHolder;
@@ -20,7 +20,7 @@ import javax.annotation.processing.Generated;
  * A generated base class to be extended by the @dagger.hilt.android.AndroidEntryPoint annotated class. If using the Gradle plugin, this is swapped as the base class via bytecode transformation.
  */
 @Generated("dagger.hilt.android.processor.internal.androidentrypoint.ActivityGenerator")
-public abstract class Hilt_MainActivity extends SalesforceActivity implements GeneratedComponentManagerHolder {
+public abstract class Hilt_MainActivity extends ComponentActivity implements GeneratedComponentManagerHolder {
   private SavedStateHandleHolder savedStateHandleHolder;
 
   private volatile ActivityComponentManager componentManager;
@@ -28,6 +28,11 @@ public abstract class Hilt_MainActivity extends SalesforceActivity implements Ge
   private final Object componentManagerLock = new Object();
 
   private boolean injected = false;
+
+  Hilt_MainActivity(int contentLayoutId) {
+    super(contentLayoutId);
+    _initHiltInternal();
+  }
 
   Hilt_MainActivity() {
     super();
@@ -60,7 +65,7 @@ public abstract class Hilt_MainActivity extends SalesforceActivity implements Ge
   }
 
   @Override
-  public void onDestroy() {
+  protected void onDestroy() {
     super.onDestroy();
     if (savedStateHandleHolder != null) {
       savedStateHandleHolder.clear();

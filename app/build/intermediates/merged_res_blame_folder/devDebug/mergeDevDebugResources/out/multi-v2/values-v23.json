@@ -1,20 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "com.catalent.onehub.app-mergeDevDebugResources-95:/values-v23/values-v23.xml",
+            "outputFile": "com.catalent.onehub.app-mergeDevDebugResources-96:/values-v23/values-v23.xml",
             "map": [
                 {
-                    "source": "/Users/ingawale_o/.gradle/caches/9.3.1/transforms/0b783adc133471faead36d348020b94f/transformed/work-runtime-2.10.3/res/values-v23/values-v23.xml",
-                    "from": {
-                        "startLines": "2,3",
-                        "startColumns": "4,4",
-                        "startOffsets": "55,121",
-                        "endColumns": "65,62",
-                        "endOffsets": "116,179"
-                    }
-                },
-                {
-                    "source": "/Users/ingawale_o/.gradle/caches/9.3.1/transforms/ae78b5965d2ee026d87172eb87bfbe70/transformed/cardview-1.0.0/res/values-v23/values-v23.xml",
+                    "source": "/Users/anuragshrivastava/.gradle/caches/9.3.1/transforms/bc8b4e4a9394f855868ba4bb2d3b723c/transformed/cardview-1.0.0/res/values-v23/values-v23.xml",
                     "from": {
                         "startLines": "2",
                         "startColumns": "4",
@@ -33,7 +23,17 @@
                     }
                 },
                 {
-                    "source": "/Users/ingawale_o/.gradle/caches/9.3.1/transforms/617f40259c18b55c67ee20354a410773/transformed/appcompat-1.7.1/res/values-v23/values-v23.xml",
+                    "source": "/Users/anuragshrivastava/.gradle/caches/9.3.1/transforms/976d048551a9ab925fe934ad38f80a46/transformed/work-runtime-2.10.3/res/values-v23/values-v23.xml",
+                    "from": {
+                        "startLines": "2,3",
+                        "startColumns": "4,4",
+                        "startOffsets": "55,121",
+                        "endColumns": "65,62",
+                        "endOffsets": "116,179"
+                    }
+                },
+                {
+                    "source": "/Users/anuragshrivastava/.gradle/caches/9.3.1/transforms/87ef7b4e67b117c2ab747648cedb99ae/transformed/appcompat-1.7.1/res/values-v23/values-v23.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,20,34,35,36,39,43,44,45,46",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4",
@@ -52,7 +52,7 @@
                     }
                 },
                 {
-                    "source": "/Users/ingawale_o/.gradle/caches/9.3.1/transforms/387bf962a01a0a69720aa5db44eab4e7/transformed/material-1.13.0/res/values-v23/values-v23.xml",
+                    "source": "/Users/anuragshrivastava/.gradle/caches/9.3.1/transforms/aa098c0860d2e9d6827811159c030e3e/transformed/material-1.13.0/res/values-v23/values-v23.xml",
                     "from": {
                         "startLines": "2,5,9,13,16,19,22,25,28,32",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4",

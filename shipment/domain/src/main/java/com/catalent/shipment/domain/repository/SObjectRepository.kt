@@ -23,4 +23,22 @@ interface SObjectRepository {
         sObjectType: String,
         displayField: String
     )
+
+    /**
+     * Searches for SObjects remotely if not found locally or to refresh search results.
+     */
+    suspend fun searchRemotely(
+        sObjectType: String,
+        displayField: String,
+        query: String
+    )
+
+    /**
+     * Loads the next page of data.
+     */
+    suspend fun loadMore(
+        sObjectType: String,
+        displayField: String,
+        offset: Int
+    )
 }

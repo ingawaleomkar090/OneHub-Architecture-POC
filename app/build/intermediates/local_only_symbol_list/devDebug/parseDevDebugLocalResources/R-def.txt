@@ -12,6 +12,7 @@ drawable ic_launcher_background
 drawable ic_launcher_foreground
 mipmap ic_launcher
 mipmap ic_launcher_round
+string account_type
 string app_name
 string clear_button
 string error_invalid_credentials
@@ -28,6 +29,7 @@ string title_error
 string welcome
 style Theme.CatalentOneHub
 style Theme.CatalentOneHubNoActionBar
+xml authenticator
 xml backup_rules
 xml data_extraction_rules
 xml servers

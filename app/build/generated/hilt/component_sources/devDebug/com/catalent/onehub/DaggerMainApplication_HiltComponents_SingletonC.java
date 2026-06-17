@@ -2,10 +2,16 @@ package com.catalent.onehub;
 
 import android.app.Activity;
 import android.app.Service;
+import android.content.Context;
 import android.view.View;
 import androidx.fragment.app.Fragment;
+import androidx.hilt.work.HiltWorkerFactory;
+import androidx.hilt.work.WorkerAssistedFactory;
+import androidx.hilt.work.WorkerFactoryModule_ProvideFactoryFactory;
 import androidx.lifecycle.SavedStateHandle;
 import androidx.lifecycle.ViewModel;
+import androidx.work.ListenableWorker;
+import androidx.work.WorkerParameters;
 import com.catalent.auth.data.SalesforceAuthRepository;
 import com.catalent.auth.data.di.AuthDataModule_Companion_ProvideLogoutUseCaseFactory;
 import com.catalent.auth.domain.usecase.LogoutUseCase;
@@ -13,10 +19,25 @@ import com.catalent.auth.ui.AuthViewModel;
 import com.catalent.auth.ui.AuthViewModel_HiltModules;
 import com.catalent.auth.ui.AuthViewModel_HiltModules_BindsModule_Binds_LazyMapKey;
 import com.catalent.auth.ui.AuthViewModel_HiltModules_KeyModule_Provide_LazyMapKey;
+import com.catalent.auth.ui.ForgotPasswordViewModel;
+import com.catalent.auth.ui.ForgotPasswordViewModel_HiltModules;
+import com.catalent.auth.ui.ForgotPasswordViewModel_HiltModules_BindsModule_Binds_LazyMapKey;
+import com.catalent.auth.ui.ForgotPasswordViewModel_HiltModules_KeyModule_Provide_LazyMapKey;
+import com.catalent.auth.ui.LoginViewModel;
+import com.catalent.auth.ui.LoginViewModel_HiltModules;
+import com.catalent.auth.ui.LoginViewModel_HiltModules_BindsModule_Binds_LazyMapKey;
+import com.catalent.auth.ui.LoginViewModel_HiltModules_KeyModule_Provide_LazyMapKey;
+import com.catalent.core.common.AppDispatchers;
 import com.catalent.core.network.ClientProvider;
 import com.catalent.core.network.NetworkManager;
 import com.catalent.onehub.presentation.ui.MainActivity;
 import com.catalent.onehub.presentation.ui.MainActivity_MembersInjector;
+import com.catalent.onehub.presentation.viewmodel.HomeViewModel;
+import com.catalent.onehub.presentation.viewmodel.HomeViewModel_HiltModules;
+import com.catalent.onehub.presentation.viewmodel.HomeViewModel_HiltModules_BindsModule_Binds_LazyMapKey;
+import com.catalent.onehub.presentation.viewmodel.HomeViewModel_HiltModules_KeyModule_Provide_LazyMapKey;
+import com.catalent.onehub.sync.SyncWorker;
+import com.catalent.onehub.sync.SyncWorker_AssistedFactory;
 import com.catalent.shipment.data.repository.SalesforceSObjectRepository;
 import com.catalent.shipment.ui.presentation.viewmodel.SObjectListViewModel;
 import com.catalent.shipment.ui.presentation.viewmodel.SObjectListViewModel_HiltModules;
@@ -44,6 +65,7 @@ import dagger.internal.LazyClassKeyMap;
 import dagger.internal.MapBuilder;
 import dagger.internal.Preconditions;
 import dagger.internal.Provider;
+import dagger.internal.SingleCheck;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
@@ -383,7 +405,7 @@ public final class DaggerMainApplication_HiltComponents_SingletonC {
 
     @Override
     public Map<Class<?>, Boolean> getViewModelKeys() {
-      return LazyClassKeyMap.<Boolean>of(MapBuilder.<String, Boolean>newMapBuilder(2).put(AuthViewModel_HiltModules_KeyModule_Provide_LazyMapKey.lazyClassKeyName, AuthViewModel_HiltModules.KeyModule.provide()).put(SObjectListViewModel_HiltModules_KeyModule_Provide_LazyMapKey.lazyClassKeyName, SObjectListViewModel_HiltModules.KeyModule.provide()).build());
+      return LazyClassKeyMap.<Boolean>of(MapBuilder.<String, Boolean>newMapBuilder(5).put(AuthViewModel_HiltModules_KeyModule_Provide_LazyMapKey.lazyClassKeyName, AuthViewModel_HiltModules.KeyModule.provide()).put(ForgotPasswordViewModel_HiltModules_KeyModule_Provide_LazyMapKey.lazyClassKeyName, ForgotPasswordViewModel_HiltModules.KeyModule.provide()).put(HomeViewModel_HiltModules_KeyModule_Provide_LazyMapKey.lazyClassKeyName, HomeViewModel_HiltModules.KeyModule.provide()).put(LoginViewModel_HiltModules_KeyModule_Provide_LazyMapKey.lazyClassKeyName, LoginViewModel_HiltModules.KeyModule.provide()).put(SObjectListViewModel_HiltModules_KeyModule_Provide_LazyMapKey.lazyClassKeyName, SObjectListViewModel_HiltModules.KeyModule.provide()).build());
     }
 
     @Override
@@ -418,6 +440,12 @@ public final class DaggerMainApplication_HiltComponents_SingletonC {
 
     Provider<AuthViewModel> authViewModelProvider;
 
+    Provider<ForgotPasswordViewModel> forgotPasswordViewModelProvider;
+
+    Provider<HomeViewModel> homeViewModelProvider;
+
+    Provider<LoginViewModel> loginViewModelProvider;
+
     Provider<SObjectListViewModel> sObjectListViewModelProvider;
 
     ViewModelCImpl(SingletonCImpl singletonCImpl, ActivityRetainedCImpl activityRetainedCImpl,
@@ -433,12 +461,15 @@ public final class DaggerMainApplication_HiltComponents_SingletonC {
     private void initialize(final SavedStateHandle savedStateHandleParam,
         final ViewModelLifecycle viewModelLifecycleParam) {
       this.authViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 0);
-      this.sObjectListViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 1);
+      this.forgotPasswordViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 1);
+      this.homeViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 2);
+      this.loginViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 3);
+      this.sObjectListViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 4);
     }
 
     @Override
     public Map<Class<?>, javax.inject.Provider<ViewModel>> getHiltViewModelMap() {
-      return LazyClassKeyMap.<javax.inject.Provider<ViewModel>>of(MapBuilder.<String, javax.inject.Provider<ViewModel>>newMapBuilder(2).put(AuthViewModel_HiltModules_BindsModule_Binds_LazyMapKey.lazyClassKeyName, ((Provider) authViewModelProvider)).put(SObjectListViewModel_HiltModules_BindsModule_Binds_LazyMapKey.lazyClassKeyName, ((Provider) sObjectListViewModelProvider)).build());
+      return LazyClassKeyMap.<javax.inject.Provider<ViewModel>>of(MapBuilder.<String, javax.inject.Provider<ViewModel>>newMapBuilder(5).put(AuthViewModel_HiltModules_BindsModule_Binds_LazyMapKey.lazyClassKeyName, ((Provider) authViewModelProvider)).put(ForgotPasswordViewModel_HiltModules_BindsModule_Binds_LazyMapKey.lazyClassKeyName, ((Provider) forgotPasswordViewModelProvider)).put(HomeViewModel_HiltModules_BindsModule_Binds_LazyMapKey.lazyClassKeyName, ((Provider) homeViewModelProvider)).put(LoginViewModel_HiltModules_BindsModule_Binds_LazyMapKey.lazyClassKeyName, ((Provider) loginViewModelProvider)).put(SObjectListViewModel_HiltModules_BindsModule_Binds_LazyMapKey.lazyClassKeyName, ((Provider) sObjectListViewModelProvider)).build());
     }
 
     @Override
@@ -470,7 +501,16 @@ public final class DaggerMainApplication_HiltComponents_SingletonC {
           case 0: // com.catalent.auth.ui.AuthViewModel
           return (T) new AuthViewModel(singletonCImpl.logoutUseCase(), singletonCImpl.salesforceAuthRepositoryProvider.get());
 
-          case 1: // com.catalent.shipment.ui.presentation.viewmodel.SObjectListViewModel
+          case 1: // com.catalent.auth.ui.ForgotPasswordViewModel
+          return (T) new ForgotPasswordViewModel(singletonCImpl.salesforceAuthRepositoryProvider.get());
+
+          case 2: // com.catalent.onehub.presentation.viewmodel.HomeViewModel
+          return (T) new HomeViewModel();
+
+          case 3: // com.catalent.auth.ui.LoginViewModel
+          return (T) new LoginViewModel(singletonCImpl.salesforceAuthRepositoryProvider.get());
+
+          case 4: // com.catalent.shipment.ui.presentation.viewmodel.SObjectListViewModel
           return (T) new SObjectListViewModel(singletonCImpl.salesforceSObjectRepositoryProvider.get());
 
           default: throw new AssertionError(id);
@@ -553,18 +593,31 @@ public final class DaggerMainApplication_HiltComponents_SingletonC {
 
     private final SingletonCImpl singletonCImpl = this;
 
-    Provider<ClientProvider> clientProvider;
+    Provider<AppDispatchers> appDispatchersProvider;
 
-    Provider<NetworkManager> networkManagerProvider;
+    Provider<SalesforceSObjectRepository> salesforceSObjectRepositoryProvider;
+
+    Provider<ClientProvider> clientProvider;
 
     Provider<SalesforceAuthRepository> salesforceAuthRepositoryProvider;
 
-    Provider<SalesforceSObjectRepository> salesforceSObjectRepositoryProvider;
+    Provider<SyncWorker_AssistedFactory> syncWorker_AssistedFactoryProvider;
+
+    Provider<NetworkManager> networkManagerProvider;
 
     SingletonCImpl(ApplicationContextModule applicationContextModuleParam) {
       this.applicationContextModule = applicationContextModuleParam;
       initialize(applicationContextModuleParam);
 
+    }
+
+    Map<String, javax.inject.Provider<WorkerAssistedFactory<? extends ListenableWorker>>> mapOfStringAndProviderOfWorkerAssistedFactoryOf(
+        ) {
+      return Collections.<String, javax.inject.Provider<WorkerAssistedFactory<? extends ListenableWorker>>>singletonMap("com.catalent.onehub.sync.SyncWorker", ((Provider) syncWorker_AssistedFactoryProvider));
+    }
+
+    HiltWorkerFactory hiltWorkerFactory() {
+      return WorkerFactoryModule_ProvideFactoryFactory.provideFactory(mapOfStringAndProviderOfWorkerAssistedFactoryOf());
     }
 
     LogoutUseCase logoutUseCase() {
@@ -573,14 +626,17 @@ public final class DaggerMainApplication_HiltComponents_SingletonC {
 
     @SuppressWarnings("unchecked")
     private void initialize(final ApplicationContextModule applicationContextModuleParam) {
-      this.clientProvider = DoubleCheck.provider(new SwitchingProvider<ClientProvider>(singletonCImpl, 0));
-      this.networkManagerProvider = DoubleCheck.provider(new SwitchingProvider<NetworkManager>(singletonCImpl, 1));
-      this.salesforceAuthRepositoryProvider = DoubleCheck.provider(new SwitchingProvider<SalesforceAuthRepository>(singletonCImpl, 2));
-      this.salesforceSObjectRepositoryProvider = DoubleCheck.provider(new SwitchingProvider<SalesforceSObjectRepository>(singletonCImpl, 3));
+      this.appDispatchersProvider = DoubleCheck.provider(new SwitchingProvider<AppDispatchers>(singletonCImpl, 2));
+      this.salesforceSObjectRepositoryProvider = DoubleCheck.provider(new SwitchingProvider<SalesforceSObjectRepository>(singletonCImpl, 1));
+      this.clientProvider = DoubleCheck.provider(new SwitchingProvider<ClientProvider>(singletonCImpl, 4));
+      this.salesforceAuthRepositoryProvider = DoubleCheck.provider(new SwitchingProvider<SalesforceAuthRepository>(singletonCImpl, 3));
+      this.syncWorker_AssistedFactoryProvider = SingleCheck.provider(new SwitchingProvider<SyncWorker_AssistedFactory>(singletonCImpl, 0));
+      this.networkManagerProvider = DoubleCheck.provider(new SwitchingProvider<NetworkManager>(singletonCImpl, 5));
     }
 
     @Override
     public void injectMainApplication(MainApplication arg0) {
+      injectMainApplication2(arg0);
     }
 
     @Override
@@ -598,6 +654,12 @@ public final class DaggerMainApplication_HiltComponents_SingletonC {
       return new ServiceCBuilder(singletonCImpl);
     }
 
+    @CanIgnoreReturnValue
+    private MainApplication injectMainApplication2(MainApplication instance) {
+      MainApplication_MembersInjector.injectWorkerFactory(instance, hiltWorkerFactory());
+      return instance;
+    }
+
     private static final class SwitchingProvider<T> implements Provider<T> {
       private final SingletonCImpl singletonCImpl;
 
@@ -612,17 +674,28 @@ public final class DaggerMainApplication_HiltComponents_SingletonC {
       @Override
       public T get() {
         switch (id) {
-          case 0: // com.catalent.core.network.ClientProvider
+          case 0: // com.catalent.onehub.sync.SyncWorker_AssistedFactory
+          return (T) new SyncWorker_AssistedFactory() {
+            @Override
+            public SyncWorker create(Context context, WorkerParameters params) {
+              return new SyncWorker(context, params, singletonCImpl.salesforceSObjectRepositoryProvider.get(), singletonCImpl.salesforceAuthRepositoryProvider.get());
+            }
+          };
+
+          case 1: // com.catalent.shipment.data.repository.SalesforceSObjectRepository
+          return (T) new SalesforceSObjectRepository(singletonCImpl.appDispatchersProvider.get());
+
+          case 2: // com.catalent.core.common.AppDispatchers
+          return (T) new AppDispatchers();
+
+          case 3: // com.catalent.auth.data.SalesforceAuthRepository
+          return (T) new SalesforceAuthRepository(singletonCImpl.clientProvider.get(), singletonCImpl.appDispatchersProvider.get());
+
+          case 4: // com.catalent.core.network.ClientProvider
           return (T) new ClientProvider();
 
-          case 1: // com.catalent.core.network.NetworkManager
+          case 5: // com.catalent.core.network.NetworkManager
           return (T) new NetworkManager(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule));
-
-          case 2: // com.catalent.auth.data.SalesforceAuthRepository
-          return (T) new SalesforceAuthRepository(singletonCImpl.clientProvider.get());
-
-          case 3: // com.catalent.shipment.data.repository.SalesforceSObjectRepository
-          return (T) new SalesforceSObjectRepository(singletonCImpl.clientProvider.get());
 
           default: throw new AssertionError(id);
         }

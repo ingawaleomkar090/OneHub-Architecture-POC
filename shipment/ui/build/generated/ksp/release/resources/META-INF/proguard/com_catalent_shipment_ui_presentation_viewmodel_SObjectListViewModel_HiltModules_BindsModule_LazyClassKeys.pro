@@ -1,1 +1,0 @@
--keep,allowobfuscation,allowshrinking class com.catalent.shipment.ui.presentation.viewmodel.SObjectListViewModel

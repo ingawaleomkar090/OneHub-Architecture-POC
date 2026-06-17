@@ -35,6 +35,7 @@ android {
 dependencies {
 	// Modules
 	implementation(projects.auth.domain)
+	implementation(projects.shipment.domain)
 	implementation(projects.core)
 
 	// Hilt

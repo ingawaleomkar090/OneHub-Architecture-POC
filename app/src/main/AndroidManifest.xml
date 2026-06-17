@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:allowBackup="true"
@@ -26,6 +27,19 @@
             </intent-filter>
         </activity>
 
+        <service
+            android:name="com.salesforce.androidsdk.auth.AuthenticatorService"
+            android:permission="android.permission.BIND_REMOTELY_RENDERED_SERVICE"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.accounts.AccountAuthenticator" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.accounts.AccountAuthenticator"
+                android:resource="@xml/authenticator" />
+        </service>
+
 <!--        <activity android:name="com.salesforce.androidsdk.ui.LoginActivity"-->
 <!--            android:theme="@style/Theme.CatalentOneHubNoActionBar"-->
 <!--            android:launchMode="singleTask"-->
@@ -42,22 +56,22 @@
 <!--        </activity>-->
 
         <!-- Salesforce login — handles OAuth redirect -->
-        <activity
-            android:name="com.salesforce.androidsdk.ui.LoginActivity"
-            android:exported="true"
-            android:launchMode="singleTask"
-            android:theme="@style/Theme.CatalentOneHubNoActionBar"
-            tools:replace="android:theme">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data
-                    android:scheme="fieldagentapp"
-                    android:host="mobile"
-                    android:path="/oauth/onehub" />
-            </intent-filter>
-        </activity>
+<!--        <activity-->
+<!--            android:name="com.salesforce.androidsdk.ui.LoginActivity"-->
+<!--            android:exported="true"-->
+<!--            android:launchMode="singleTask"-->
+<!--            android:theme="@style/Theme.CatalentOneHubNoActionBar"-->
+<!--            tools:replace="android:theme">-->
+<!--            <intent-filter>-->
+<!--                <action android:name="android.intent.action.VIEW" />-->
+<!--                <category android:name="android.intent.category.DEFAULT" />-->
+<!--                <category android:name="android.intent.category.BROWSABLE" />-->
+<!--                <data-->
+<!--                    android:scheme="fieldagentapp"-->
+<!--                    android:host="mobile"-->
+<!--                    android:path="/oauth/onehub" />-->
+<!--            </intent-filter>-->
+<!--        </activity>-->
 
         <!-- WorkManager — Disable default initializer for custom Hilt Configuration -->
         <provider

@@ -13,5 +13,11 @@ public final class BuildConfig {
   // Field from build type: debug
   public static final boolean ENABLE_CONSOLE_LOGGING = true;
   // Field from build type: debug
+  public static final String SALESFORCE_COMMUNITY_BASE_URL = "https://catalent--onehub.sandbox.my.site.com/onehub";
+  // Field from build type: debug
+  public static final String SALESFORCE_CONSUMER_KEY = "3MVG9WCdh6PFin0hoY9Attgl85YFvsToXWXRiFjaQ19Men_slb.SxeDTmJOxM0iaCiQOBdTR6y9cvye2BPkb6";
+  // Field from build type: debug
   public static final String SALESFORCE_LOGIN_HOST = "test.salesforce.com";
+  // Field from build type: debug
+  public static final String SALESFORCE_REDIRECT_AUTHURI = "https://catalent--onehub.sandbox.my.site.com/onehub/services/oauth2/echo";
 }

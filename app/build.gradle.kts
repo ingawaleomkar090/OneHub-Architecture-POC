@@ -22,6 +22,14 @@ val sfRedirectUri = localProperties.getProperty("salesforce.redirect.uri")
 	?: System.getenv("SALESFORCE_REDIRECT_URI")
 	?: ""
 
+val sfAuthRedirectUri = localProperties.getProperty("salesforce.redirect.authuri")
+	?: System.getenv("SALESFORCE_REDIRECT_AUTHURI")
+	?: ""
+
+val sfBaseCommunityUrl = localProperties.getProperty("salesforce.base.url")
+	?: System.getenv("SALESFORCE_COMMUNITY_BASE_URL")
+	?: ""
+
 android {
 	namespace = "com.catalent.onehub"
 	compileSdk = 36
@@ -36,6 +44,9 @@ android {
 
 		// default BuildConfig fields
 		buildConfigField("String", "SALESFORCE_LOGIN_HOST", "\"login.salesforce.com\"")
+		buildConfigField("String", "SALESFORCE_CONSUMER_KEY", "\"$sfConsumerKey\"")
+		buildConfigField("String", "SALESFORCE_REDIRECT_AUTHURI", "\"$sfAuthRedirectUri\"")
+		buildConfigField("String", "SALESFORCE_COMMUNITY_BASE_URL", "\"$sfBaseCommunityUrl\"")
 
 		// Salesforce secrets injected as resources
 		resValue("string", "remoteAccessConsumerKey", sfConsumerKey)
@@ -50,6 +61,9 @@ android {
 			isMinifyEnabled = false
 			buildConfigField("boolean", "ENABLE_CONSOLE_LOGGING", "true")
 			buildConfigField("String", "SALESFORCE_LOGIN_HOST", "\"test.salesforce.com\"")
+			buildConfigField("String", "SALESFORCE_CONSUMER_KEY", "\"$sfConsumerKey\"")
+			buildConfigField("String", "SALESFORCE_REDIRECT_AUTHURI", "\"$sfAuthRedirectUri\"")
+			buildConfigField("String", "SALESFORCE_COMMUNITY_BASE_URL", "\"$sfBaseCommunityUrl\"")
 		}
 		release {
 			isDebuggable = false
@@ -61,6 +75,9 @@ android {
 			)
 			buildConfigField("boolean", "ENABLE_CONSOLE_LOGGING", "false")
 			buildConfigField("String", "SALESFORCE_LOGIN_HOST", "\"login.salesforce.com\"")
+			buildConfigField("String", "SALESFORCE_CONSUMER_KEY", "\"$sfConsumerKey\"")
+			buildConfigField("String", "SALESFORCE_REDIRECT_AUTHURI", "\"$sfAuthRedirectUri\"")
+			buildConfigField("String", "SALESFORCE_COMMUNITY_BASE_URL", "\"$sfBaseCommunityUrl\"")
 			signingConfig = signingConfigs.getByName("debug")
 		}
 	}
@@ -73,6 +90,9 @@ android {
 			applicationIdSuffix = ".dev"
 			versionNameSuffix = "-dev"
 			buildConfigField("String", "SALESFORCE_LOGIN_HOST", "\"test.salesforce.com\"")
+			buildConfigField("String", "SALESFORCE_CONSUMER_KEY", "\"$sfConsumerKey\"")
+			buildConfigField("String", "SALESFORCE_REDIRECT_AUTHURI", "\"$sfAuthRedirectUri\"")
+			buildConfigField("String", "SALESFORCE_COMMUNITY_BASE_URL", "\"$sfBaseCommunityUrl\"")
 			buildConfigField("boolean", "ENABLE_CONSOLE_LOGGING", "true")
 			resValue("string", "app_name", "OneHub Dev")
 		}
@@ -81,12 +101,18 @@ android {
 			applicationIdSuffix = ".staging"
 			versionNameSuffix = "-staging"
 			buildConfigField("String", "SALESFORCE_LOGIN_HOST", "\"test.salesforce.com\"")
+			buildConfigField("String", "SALESFORCE_CONSUMER_KEY", "\"$sfConsumerKey\"")
+			buildConfigField("String", "SALESFORCE_REDIRECT_AUTHURI", "\"$sfAuthRedirectUri\"")
+			buildConfigField("String", "SALESFORCE_COMMUNITY_BASE_URL", "\"$sfBaseCommunityUrl\"")
 			buildConfigField("boolean", "ENABLE_CONSOLE_LOGGING", "true")
 			resValue("string", "app_name", "OneHub Staging")
 		}
 		create("prod") {
 			dimension = "environment"
 			buildConfigField("String", "SALESFORCE_LOGIN_HOST", "\"login.salesforce.com\"")
+			buildConfigField("String", "SALESFORCE_CONSUMER_KEY", "\"$sfConsumerKey\"")
+			buildConfigField("String", "SALESFORCE_REDIRECT_AUTHURI", "\"$sfAuthRedirectUri\"")
+			buildConfigField("String", "SALESFORCE_COMMUNITY_BASE_URL", "\"$sfBaseCommunityUrl\"")
 			buildConfigField("boolean", "ENABLE_CONSOLE_LOGGING", "false")
 			resValue("string", "app_name", "OneHub")
 		}
